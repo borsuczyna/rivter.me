@@ -31,6 +31,6 @@ expect('create block at 50x50 position', (): boolean => {
     return success;
 });
 
-expect('destroy not valid block', (): boolean => {
+expect('destroy invalid block', (): boolean => {
     return !destroyBlock(null);
 })
