@@ -13,6 +13,14 @@ expect('destroy block', (): boolean => {
     return destroyBlock(block);
 });
 
+expect('destroy block via token', (): boolean => {
+    return destroyBlock(block.token);
+});
+
+expect('destroy invalid block', (): boolean => {
+    return !destroyBlock(null);
+})
+
 expect('create block at cursor position', (): boolean => {
     block = createBlock('Player joined');
     let success = block.x == cursorPosition.x && block.y == cursorPosition.y;
@@ -30,7 +38,3 @@ expect('create block at 50x50 position', (): boolean => {
 
     return success;
 });
-
-expect('destroy invalid block', (): boolean => {
-    return !destroyBlock(null);
-})

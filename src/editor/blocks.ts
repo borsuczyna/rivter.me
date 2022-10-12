@@ -1,3 +1,4 @@
+import { generateToken } from "../utils/token";
 import { cursorPosition } from "../window/cursor";
 
 export type BlockType = string;
@@ -16,6 +17,8 @@ export interface OutputNode {
 };
 
 export interface Block {
+    token: string;
+
     type: BlockType;
     inputNodes: InputNode[];
     outputNodes: OutputNode[];
@@ -24,13 +27,18 @@ export interface Block {
     y: number;
 };
 
-export const blocks: Block[] = [];
+export var blocks: Block[] = [];
+
+export function updateBlocksDOM(): void {
+
+}
 
 export function createBlock(type: BlockType, x?: number, y?: number): Block {
     x = x || cursorPosition.x;
     y = y || cursorPosition.y;
     
     let block: Block = {
+        token: generateToken(),
         type: type,
         inputNodes: [],
         outputNodes: [],
@@ -43,11 +51,16 @@ export function createBlock(type: BlockType, x?: number, y?: number): Block {
     return block;
 }
 
-export function destroyBlock(block: Block): boolean {
-    const blockIndex = blocks.indexOf(block);
-    if (blockIndex !== -1) {
-        blocks.splice(blockIndex, 1);
+export function destroyBlock(block: Block | string): boolean {
+    if(typeof block == 'string') {
+        blocks = blocks.filter((value: Block, index: number) => value.token != block);
         return true;
+    } else {
+        const blockIndex = blocks.indexOf(block);
+        if (blockIndex !== -1) {
+            blocks.splice(blockIndex, 1);
+            return true;
+        }
     }
 
     return false;
