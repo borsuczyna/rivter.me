@@ -1,3 +1,5 @@
+import { cursorPosition } from "../window/cursor";
+
 export type BlockType = string;
 
 export interface NodeConnection {
@@ -21,12 +23,15 @@ export interface Block {
 
 export const blocks: Block[] = [];
 
-export function createBlock(type: BlockType): Block {
+export function createBlock(type: BlockType, x?: number, y?: number): Block {
     let block: Block = {
         type: type,
         inputNodes: [],
         outputNodes: [],
     };
+
+    x = x || cursorPosition.x;
+    y = y || cursorPosition.y;
 
     blocks.push(block);
 

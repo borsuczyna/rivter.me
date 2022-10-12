@@ -19,7 +19,7 @@ function updateEditorDimensions(): void {
     editorCanvas.canvas.height = height;
 }
 
-export function initEditor(): void {
+function initEditor(): void {
     if(editorCanvas && editorWindow) return;
 
     let window: HTMLCanvasElement = <HTMLCanvasElement> document.getElementById('editor-canvas');;
@@ -29,3 +29,5 @@ export function initEditor(): void {
     updateEditorDimensions();
     addEventListener('resize', updateEditorDimensions);
 }
+
+initEditor();

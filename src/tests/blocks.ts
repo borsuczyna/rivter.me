@@ -11,3 +11,7 @@ expect('create block', (): boolean => {
 expect('destroy block', (): boolean => {
     return destroyBlock(block);
 });
+
+expect('destroy not valid block', (): boolean => {
+    return !destroyBlock(null);
+})
