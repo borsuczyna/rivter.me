@@ -1,5 +1,6 @@
-import { generateToken } from "../utils/token";
-import { cursorPosition } from "../window/cursor";
+import { generateToken } from '../utils/token';
+import { cursorPosition } from '../window/cursor';
+import { editorWindow } from './main';
 
 export type BlockType = string;
 
@@ -34,20 +35,34 @@ function createBlockDOM(block: Block): HTMLDivElement {
     let htmlElement: HTMLDivElement = <HTMLDivElement> document.createElement('div');
 
     htmlElement.classList.add('block-element');
-    
-    
+    htmlElement.id = `block-${block.token}`;
+    editorWindow.appendChild(htmlElement);
+
     return htmlElement;
 }
 
-// Updating single block DOM
-export function updateBlockDOM(block: Block | string): void {
+// Get block DOM element
+function getBlockDOM(block: Block | string): HTMLDivElement {
     let blockElement: Block = getBlock(block);
     if(!blockElement) return;
 
     let htmlElement: HTMLDivElement = <HTMLDivElement> document.getElementById(`block-${blockElement.token}`);
     if(!htmlElement) htmlElement = createBlockDOM(blockElement);
 
+    return htmlElement;
+}
 
+// Destroying block DOM element
+function destroyBlockDOM(block: Block | string): void {
+    let htmlElement: HTMLDivElement = getBlockDOM(block);
+    if(!htmlElement) return;
+
+    htmlElement.remove();
+}
+
+// Updating single block DOM
+export function updateBlockDOM(block: Block | string): void {
+    let htmlElement: HTMLDivElement = getBlockDOM(block);
 }
 
 // Updating all blocks DOM's
@@ -90,11 +105,13 @@ export function getBlock(block: Block | string): Block {
 
 // Destroying blocks
 export function destroyBlock(block: Block | string): boolean {
+    destroyBlockDOM(block);
+
     if(typeof block == 'string') {
         blocks = blocks.filter((value: Block, index: number) => value.token != block);
         return true;
     } else {
-        const blockIndex = blocks.indexOf(block);
+        const blockIndex: number = blocks.indexOf(block);
         if (blockIndex !== -1) {
             blocks.splice(blockIndex, 1);
             return true;

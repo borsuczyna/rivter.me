@@ -38,3 +38,27 @@ expect('create block at 50x50 position', (): boolean => {
 
     return success;
 });
+
+expect('created block should create DOM element', (): boolean => {
+    block = createBlock('Player joined', 50, 50);
+    let DOM = document.getElementById(`block-${block.token}`);
+
+    destroyBlock(block);
+
+    return !!DOM;
+});
+
+expect('destroying block should delete DOM element', (): boolean => {
+    block = createBlock('Player joined', 50, 50);
+    let preDOM = document.getElementById(`block-${block.token}`);
+    destroyBlock(block);
+    let postDOM = document.getElementById(`block-${block.token}`);
+
+    return preDOM && !postDOM;
+});
+
+expect('create block for testing frontend purposes', (): boolean => {
+    block = createBlock('Player joined', 50, 50);
+
+    return !!block;
+});
