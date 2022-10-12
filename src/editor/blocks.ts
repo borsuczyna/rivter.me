@@ -29,10 +29,35 @@ export interface Block {
 
 export var blocks: Block[] = [];
 
-export function updateBlocksDOM(): void {
+// Creating block DOM element
+function createBlockDOM(block: Block): HTMLDivElement {
+    let htmlElement: HTMLDivElement = <HTMLDivElement> document.createElement('div');
+
+    htmlElement.classList.add('block-element');
+    
+    
+    return htmlElement;
+}
+
+// Updating single block DOM
+export function updateBlockDOM(block: Block | string): void {
+    let blockElement: Block = getBlock(block);
+    if(!blockElement) return;
+
+    let htmlElement: HTMLDivElement = <HTMLDivElement> document.getElementById(`block-${blockElement.token}`);
+    if(!htmlElement) htmlElement = createBlockDOM(blockElement);
+
 
 }
 
+// Updating all blocks DOM's
+export function updateBlocksDOM(): void {
+    for(let block of blocks) {
+        updateBlockDOM(block);
+    }
+}
+
+// Creating blocks
 export function createBlock(type: BlockType, x?: number, y?: number): Block {
     x = x || cursorPosition.x;
     y = y || cursorPosition.y;
@@ -48,9 +73,22 @@ export function createBlock(type: BlockType, x?: number, y?: number): Block {
 
     blocks.push(block);
 
+    // Update block DOM
+    updateBlockDOM(block);
+
     return block;
 }
 
+// Get block by Block or token
+export function getBlock(block: Block | string): Block {
+    if(typeof block != 'string') {
+        return block;
+    } else {
+        return blocks.find((value) => value.token == block);
+    }
+}
+
+// Destroying blocks
 export function destroyBlock(block: Block | string): boolean {
     if(typeof block == 'string') {
         blocks = blocks.filter((value: Block, index: number) => value.token != block);
