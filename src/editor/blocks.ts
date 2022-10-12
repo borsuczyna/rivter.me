@@ -28,9 +28,17 @@ export function createBlock(type: BlockType): Block {
         outputNodes: [],
     };
 
+    blocks.push(block);
+
     return block;
 }
 
 export function destroyBlock(block: Block): boolean {
-    return true;
+    const blockIndex = blocks.indexOf(block);
+    if (blockIndex !== -1) {
+        blocks.splice(blockIndex, 1);
+        return true;
+    }
+
+    return false;
 }
