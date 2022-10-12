@@ -19,19 +19,24 @@ export interface Block {
     type: BlockType;
     inputNodes: InputNode[];
     outputNodes: OutputNode[];
+
+    x: number;
+    y: number;
 };
 
 export const blocks: Block[] = [];
 
 export function createBlock(type: BlockType, x?: number, y?: number): Block {
+    x = x || cursorPosition.x;
+    y = y || cursorPosition.y;
+    
     let block: Block = {
         type: type,
         inputNodes: [],
         outputNodes: [],
+        x: x,
+        y: y
     };
-
-    x = x || cursorPosition.x;
-    y = y || cursorPosition.y;
 
     blocks.push(block);
 
