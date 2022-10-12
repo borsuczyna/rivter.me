@@ -1,0 +1,19 @@
+@import './variables.css';
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+
+    background-image: -webkit-linear-gradient(bottom,rgb(22, 22, 22) 1px, transparent 1px), -webkit-linear-gradient(left, rgb(22, 22, 22) 1px, rgb(28, 28, 28) 1px);
+    background-image: -moz-linear-gradient(bottom,rgb(22, 22, 22) 1px, transparent 1px), -webkit-linear-gradient(left, rgb(22, 22, 22) 1px, rgb(28, 28, 28) 1px);
+    background-image: -o-linear-gradient(bottom,rgb(22, 22, 22) 1px, transparent 1px), -webkit-linear-gradient(left, rgb(22, 22, 22) 1px, rgb(28, 28, 28) 1px);
+    background-image: -ms-linear-gradient(bottom,rgb(22, 22, 22) 1px, transparent 1px), -webkit-linear-gradient(left, rgb(22, 22, 22) 1px, rgb(28, 28, 28) 1px);
+    background-image: linear-gradient(bottom,rgb(22, 22, 22) 1px, transparent 1px), -webkit-linear-gradient(left, rgb(22, 22, 22) 1px, rgb(28, 28, 28) 1px);
+    background-repeat: repeat, repeat;
+    background-size: 50px, 50px;
+}
+
+canvas {
+    /* background-color: black; */
+}
