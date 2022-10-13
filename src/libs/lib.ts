@@ -1,3 +1,5 @@
+export type BlockType = string;
+
 export interface InputOutputDefintion {
     name: string;                           /* Input/output name */
     hoverTip?: string;                      /* Tip that shows when user hovers cursor over input/output */
@@ -20,5 +22,14 @@ export interface BlockDefinition {
 };
 
 export interface BlockDefinitions {
-    [key: string]: BlockDefinition
+    [key: BlockType]: BlockDefinition
 };
+
+export var definitions: BlockDefinitions = {};
+export function loadDefinitions(defs: BlockDefinitions): void {
+    definitions = {...definitions, ...defs};
+}
+
+export function findDefinition(key: BlockType): BlockDefinition | undefined {
+    return definitions[key];
+}

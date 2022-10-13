@@ -1,6 +1,6 @@
-import { BlockDefinitions } from "./lib";
+import { BlockDefinitions, loadDefinitions } from "./lib";
 
-export const types: BlockDefinitions = {
+const definitions: BlockDefinitions = {
     'Player joined': {
         name: 'Player joined',
         hoverTip: 'Event is triggered when player joins server',
@@ -20,3 +20,5 @@ export const types: BlockDefinitions = {
         isEvent: true,
     }
 };
+
+loadDefinitions(definitions);

@@ -1,16 +1,51 @@
 @import './variables.css';
 
 .block-element {
-    --position-x: 0;
-    --position-y: 0;
+    --position-x: 0px;
+    --position-y: 0px;
 
-    background-color: var(--color-test);
+    background-color: rgb(60, 60, 60);
+    color: white;
+    border: 1px solid rgb(27, 27, 27);
+    border-radius: 5px;
+    padding: 4px 8px 4px 8px;
+
+    width: max-content;
+    height: max-content;
+    
     position: absolute;
-    width: 50px;
+    min-width: 140px;
     height: 50px;
 
-    left: calc(50vw + calc(var(--board-x) * var(--board-zoom)));
-    top: calc(50vh + calc(var(--board-y) * var(--board-zoom)));
+    left: calc(50vw + calc(var(--board-x) * var(--board-zoom)) + var(--position-x) * var(--board-zoom));
+    top: calc(50vh + calc(var(--board-y) * var(--board-zoom)) + var(--position-y) * var(--board-zoom));
 
     transform: translate(-50%, -50%) scale(var(--board-zoom));
 }
+
+.block-title {
+    text-shadow: -1px -1px rgba(0, 0, 0, 0.1);
+    text-align: center;
+
+    font-family: 'Open Sans', sans-serif;
+}
+
+/* .block {
+    background-color: rgb(60, 60, 60);
+    position: absolute;
+    font-size: calc(var(--zoom) * 10px);
+    width: max-content;
+    height: max-content;
+    padding: 4px;
+    border: 1px solid rgb(27, 27, 27);
+    text-align: center;
+    transform: translate(-50%, -50%);
+    min-width: calc(var(--zoom) * 70px);
+    border-radius: calc(var(--zoom) * 3px);
+    /* transition: all 100ms linear; */
+    /* transform: all 100ms linear; */
+    /* left: calc(50vw + var(--background-x) * var(--zoom) * 20px + var(--element-01-x) * var(--zoom));
+    top: calc(50vh + var(--background-y) * var(--zoom) * 20px + var(--element-01-y) * var(--zoom)); */
+    /* max-width: calc(var(--zoom) * 100px); */
+    /* min-width: calc(var(--zoom) * 70px); */
+/* } */

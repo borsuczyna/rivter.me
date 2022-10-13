@@ -1,3 +1,6 @@
+// Definitions
+import './libs/MTA-server';
+
 import './editor/main';
 import './editor/blocks';
 import './editor/board';

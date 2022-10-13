@@ -1,8 +1,7 @@
+import { BlockDefinition, BlockType, findDefinition } from '../libs/lib';
 import { generateToken } from '../utils/token';
 import { cursorPosition } from '../window/cursor';
 import { editorWindow } from './main';
-
-export type BlockType = string;
 
 export interface NodeConnection {
     block: Block;
@@ -32,11 +31,20 @@ export var blocks: Block[] = [];
 
 // Creating block DOM element
 function createBlockDOM(block: Block): HTMLDivElement {
+    let definition: BlockDefinition | undefined = findDefinition(block.type);
+    if(!definition) return;
+
     let htmlElement: HTMLDivElement = <HTMLDivElement> document.createElement('div');
+    let title: HTMLElement = document.createElement('div');
 
     htmlElement.classList.add('block-element');
     htmlElement.id = `block-${block.token}`;
     editorWindow.appendChild(htmlElement);
+
+    title.innerText = definition.name;
+    title.classList.add('block-title');
+
+    htmlElement.appendChild(title);
 
     return htmlElement;
 }
@@ -63,6 +71,12 @@ function destroyBlockDOM(block: Block | string): void {
 // Updating single block DOM
 export function updateBlockDOM(block: Block | string): void {
     let htmlElement: HTMLDivElement = getBlockDOM(block);
+    let blockElement: Block = getBlock(block);
+
+    if(!htmlElement) return;
+
+    htmlElement.style.setProperty('--position-x', `${blockElement.x}px`);
+    htmlElement.style.setProperty('--position-y', `${blockElement.y}px`);
 }
 
 // Updating all blocks DOM's
