@@ -17,8 +17,8 @@
     min-width: 140px;
     height: 50px;
 
-    left: calc(50vw + calc(var(--board-x) * var(--board-zoom)) + var(--position-x) * var(--board-zoom));
-    top: calc(50vh + calc(var(--board-y) * var(--board-zoom)) + var(--position-y) * var(--board-zoom));
+    left: calc(50vw + var(--board-x) * var(--board-zoom) + var(--position-x) * var(--board-zoom));
+    top: calc(50vh + var(--board-y) * var(--board-zoom) + var(--position-y) * var(--board-zoom));
 
     transform: translate(-50%, -50%) scale(var(--board-zoom));
 }

@@ -1,6 +1,7 @@
 import { BlockDefinition, BlockType, findDefinition } from '../libs/lib';
 import { generateToken } from '../utils/token';
 import { cursorPosition } from '../window/cursor';
+import { getBoardFromEditorPosition } from './board';
 import { editorWindow } from './main';
 
 export interface NodeConnection {
@@ -88,8 +89,8 @@ export function updateBlocksDOM(): void {
 
 // Creating blocks
 export function createBlock(type: BlockType, x?: number, y?: number): Block {
-    x = x || cursorPosition.x;
-    y = y || cursorPosition.y;
+    x = x || getBoardFromEditorPosition(cursorPosition.x, cursorPosition.y).x;
+    y = y || getBoardFromEditorPosition(cursorPosition.x, cursorPosition.y).y;
     
     let block: Block = {
         token: generateToken(),

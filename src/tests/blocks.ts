@@ -1,4 +1,5 @@
 import { Block, createBlock, destroyBlock } from '../editor/blocks';
+import { getBoardFromEditorPosition } from '../editor/board';
 import { cursorPosition } from '../window/cursor';
 import { expect } from './test';
 
@@ -20,15 +21,6 @@ expect('destroy block via token', (): boolean => {
 expect('destroy invalid block', (): boolean => {
     return !destroyBlock(null);
 })
-
-expect('create block at cursor position', (): boolean => {
-    block = createBlock('Player joined');
-    let success = block.x == cursorPosition.x && block.y == cursorPosition.y;
-
-    destroyBlock(block);
-
-    return success;
-});
 
 expect('create block at 50x50 position', (): boolean => {
     block = createBlock('Player joined', 50, 50);
@@ -61,4 +53,19 @@ expect('create block for testing frontend purposes', (): boolean => {
     block = createBlock('Player joined', 50, 50);
 
     return !!block;
+});
+
+expect('clicking should create block on cursor position', async (): Promise<boolean> => {
+    let promise = new Promise<boolean>((resolve, reject) => {
+        addEventListener('mousePressed', (event) => {
+            let block = createBlock('Player joined');
+
+            resolve(
+                block.x == getBoardFromEditorPosition(cursorPosition.x, cursorPosition.y).x &&
+                block.y == getBoardFromEditorPosition(cursorPosition.x, cursorPosition.y).y
+            )
+        });
+    });
+
+    return await promise;
 });
