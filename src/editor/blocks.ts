@@ -120,3 +120,8 @@ export function destroyBlock(block: Block | string): boolean {
 
     return false;
 }
+
+// Get cursor under mouse
+export function getBlockUnderMouse(): Block | null {
+    return null;
+};

@@ -1,6 +1,8 @@
 import './editor/main';
-import './window/cursor';
 import './editor/blocks';
+import './editor/movement';
+import './window/cursor';
+import './window/keyboard';
 
 // Unit tests
 import './tests/blocks';

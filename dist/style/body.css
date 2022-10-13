@@ -12,6 +12,12 @@ body {
     background-image: linear-gradient(bottom,rgb(22, 22, 22) 1px, transparent 1px), -webkit-linear-gradient(left, rgb(22, 22, 22) 1px, rgb(28, 28, 28) 1px);
     background-repeat: repeat, repeat;
     background-size: 50px, 50px;
+
+    background-position-x: var(--background-x);
+    background-position-y: var(--background-y);
+
+    width: 100vw;
+    height: 50px;
 }
 
 canvas {

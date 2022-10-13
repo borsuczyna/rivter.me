@@ -1,7 +1,8 @@
 @import './variables.css';
 
 .block-element {
-    /* background-color: var(--color-test); */
+    background-color: var(--color-test);
+    position: absolute;
     width: 50px;
     height: 50px;
 }

@@ -1,3 +1,7 @@
+import { editorCursor } from "../editor/main";
+
+type CursorType = 'default' | 'alias' | 'all-scroll' | 'auto' | 'cell' | 'col-resize' | 'context-menu' | 'copy' | 'crosshair' | 'default' | 'e-resize' | 'ew-resize' | 'grab' | 'grabbing' | 'help' | 'move' | 'n-resize' | 'ne-resize' | 'nesw-resize' | 'ns-resize' | 'nw-resize' | 'nwse-resize' | 'no-drop' | 'none' | 'not-allowed' | 'pointer' | 'progress' | 'row-resize' | 's-resize' | 'se-resize' | 'sw-resize' | 'text' | 'url' | 'w-resize' | 'wait' | 'zoom-in' | 'zoom-out';
+
 export interface CursorPosition {
     x: number,
     y: number
@@ -14,3 +18,7 @@ function mouseMoved(e: MouseEvent): void {
 }
 
 addEventListener('mousemove', mouseMoved);
+
+export function setCurrentCursor(cursor: CursorType): void {
+    editorCursor.style.cursor = cursor;
+}

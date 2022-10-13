@@ -1,5 +1,6 @@
 export var editorCanvas: CanvasRenderingContext2D = null;
 export var editorWindow: HTMLElement = null;
+export var editorCursor: HTMLElement = null;
 export var editorDimensions: {
     width: number,
     height: number
@@ -20,11 +21,12 @@ function updateEditorDimensions(): void {
 }
 
 function initEditor(): void {
-    if(editorCanvas && editorWindow) return;
+    if(editorCanvas && editorWindow && editorCursor) return;
 
     let window: HTMLCanvasElement = <HTMLCanvasElement> document.getElementById('editor-canvas');;
     editorCanvas = window?.getContext('2d');
     editorWindow = document.getElementById('editor-window');
+    editorCursor = document.getElementById('editor-cursor');
 
     updateEditorDimensions();
     addEventListener('resize', updateEditorDimensions);
