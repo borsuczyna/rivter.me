@@ -36,16 +36,35 @@ function createBlockDOM(block: Block): HTMLDivElement {
     if(!definition) return;
 
     let htmlElement: HTMLDivElement = <HTMLDivElement> document.createElement('div');
-    let title: HTMLElement = document.createElement('div');
 
+    // Block element
     htmlElement.classList.add('block-element');
     htmlElement.id = `block-${block.token}`;
     editorWindow.appendChild(htmlElement);
 
+    // Block title
+    let title: HTMLDivElement = document.createElement('div');
     title.innerText = definition.name;
     title.classList.add('block-title');
 
+    // Block content
+    let blockContent: HTMLDivElement = document.createElement('div');
+    blockContent.classList.add('block-content');
+
+    // Block inputs
+    let blockInputs: HTMLDivElement = document.createElement('div');
+    blockInputs.classList.add('block-inputs');
+
+    // Block outputs
+    let blockOutputs: HTMLDivElement = document.createElement('div');
+    blockOutputs.classList.add('block-outputs');
+
+    // Append childs
+    blockContent.appendChild(blockInputs);
+    blockContent.appendChild(blockOutputs);
+
     htmlElement.appendChild(title);
+    htmlElement.appendChild(blockContent);
 
     return htmlElement;
 }

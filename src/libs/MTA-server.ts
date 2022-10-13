@@ -1,4 +1,5 @@
-import { BlockDefinitions, loadDefinitions } from "./lib";
+import { Color } from "../utils/color";
+import { BlockDefinitions, BlockNodes, loadDefinitions } from "./lib";
 
 const definitions: BlockDefinitions = {
     'Player joined': {
@@ -18,6 +19,13 @@ const definitions: BlockDefinitions = {
         ],
         
         isEvent: true,
+    }
+};
+
+const nodes: BlockNodes = {
+    'Player': {
+        color: new Color(255, 50, 50),
+        validConnections: ['Player']
     }
 };
 

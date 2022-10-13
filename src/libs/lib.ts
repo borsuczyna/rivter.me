@@ -1,3 +1,5 @@
+import { Color } from "../utils/color";
+
 export type BlockType = string;
 
 export interface InputOutputDefintion {
@@ -15,21 +17,40 @@ export interface BlockDefinition {
     motionStart: boolean;                   /* Can motion be continued with this block */
     motionNext: boolean;                    /* Can this block continue motion */
     
-    inputs: InputOutputDefintion[];          /* Inputs */
-    outputs: InputOutputDefintion[];         /* Outputs */
+    inputs: InputOutputDefintion[];         /* Inputs */
+    outputs: InputOutputDefintion[];        /* Outputs */
 
     isEvent?: boolean;                      /* Is block event - action starts with it */
+};
+
+export interface BlockNode {
+    color: Color;
+    validConnections: string[] | 'anything';
 };
 
 export interface BlockDefinitions {
     [key: BlockType]: BlockDefinition
 };
 
+export interface BlockNodes {
+    [key: string]: BlockNode
+};
+
 export var definitions: BlockDefinitions = {};
+export var nodes: BlockNodes = {};
+
 export function loadDefinitions(defs: BlockDefinitions): void {
     definitions = {...definitions, ...defs};
 }
 
+export function loadNodes(nodes_: BlockNodes): void {
+    nodes = {...nodes, ...nodes_};
+}
+
 export function findDefinition(key: BlockType): BlockDefinition | undefined {
     return definitions[key];
+}
+
+export function findNode(key: string): BlockNode | undefined {
+    return nodes[key];
 }
