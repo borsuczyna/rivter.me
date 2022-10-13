@@ -1,6 +1,6 @@
 import './editor/main';
 import './editor/blocks';
-import './editor/movement';
+import './editor/board';
 import './window/cursor';
 import './window/keyboard';
 

@@ -5,6 +5,4 @@
 #editor-cursor {
     width: 100vw;
     height: 100vh;
-    cursor: pointer !important;
-    background-color: red;
 }

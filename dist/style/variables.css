@@ -1,6 +1,7 @@
 :root {
-    --background-x: 0;
-    --background-y: 0;
+    --board-x: 0px;
+    --board-y: 0px;
+    --board-zoom: 1;
 
     --color-test: blue;
 }

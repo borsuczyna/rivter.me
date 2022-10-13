@@ -19,6 +19,24 @@ function mouseMoved(e: MouseEvent): void {
 
 addEventListener('mousemove', mouseMoved);
 
+addEventListener('mousedown', (e) => {    
+    let event: CustomEvent = new CustomEvent('mousePressed', {
+        detail: {
+            button: e.button
+        }
+    });
+    window.dispatchEvent(event);
+});
+
+addEventListener('mouseup', (e) => {    
+    let event: CustomEvent = new CustomEvent('mouseReleased', {
+        detail: {
+            button: e.button
+        }
+    });
+    window.dispatchEvent(event);
+});
+
 export function setCurrentCursor(cursor: CursorType): void {
     editorCursor.style.cursor = cursor;
 }

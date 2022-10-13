@@ -1,8 +1,16 @@
 @import './variables.css';
 
 .block-element {
+    --position-x: 0;
+    --position-y: 0;
+
     background-color: var(--color-test);
     position: absolute;
     width: 50px;
     height: 50px;
+
+    left: calc(50vw + calc(var(--board-x) * var(--board-zoom)));
+    top: calc(50vh + calc(var(--board-y) * var(--board-zoom)));
+
+    transform: translate(-50%, -50%) scale(var(--board-zoom));
 }
