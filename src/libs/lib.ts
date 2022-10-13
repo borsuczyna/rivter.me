@@ -2,7 +2,7 @@ import { Color } from "../utils/color";
 
 export type BlockType = string;
 
-export interface InputOutputDefintion {
+export interface NodeDefintion {
     name: string;                           /* Input/output name */
     hoverTip?: string;                      /* Tip that shows when user hovers cursor over input/output */
     type: string;                           /* Input/output type */
@@ -17,8 +17,8 @@ export interface BlockDefinition {
     motionStart: boolean;                   /* Can motion be continued with this block */
     motionNext: boolean;                    /* Can this block continue motion */
     
-    inputs: InputOutputDefintion[];         /* Inputs */
-    outputs: InputOutputDefintion[];        /* Outputs */
+    inputs: NodeDefintion[];         /* Inputs */
+    outputs: NodeDefintion[];        /* Outputs */
 
     isEvent?: boolean;                      /* Is block event - action starts with it */
 };

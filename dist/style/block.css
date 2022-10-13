@@ -4,6 +4,8 @@
     --position-x: 0px;
     --position-y: 0px;
 
+    font-family: 'Open Sans', sans-serif;
+
     background-color: rgb(47, 47, 47);
     color: white;
     border: 1px solid rgb(27, 27, 27);
@@ -26,22 +28,47 @@
 .block-title {
     text-shadow: -1px -1px rgba(0, 0, 0, 0.1);
     text-align: center;
-
-    font-family: 'Open Sans', sans-serif;
 }
 
 .block-content {
     display: flex;
     min-height: 0px;
     margin-top: 3px;
+    padding: 4px;
 
     border: 1px solid rgba(27, 27, 27, 0.234);
 }
 
 .block-inputs {
     flex-grow: 1;
+    
+    text-align: left;
 }
 
 .block-outputs {
     flex-grow: 1;
+    
+    text-align: right;
+}
+
+.block-output {    
+    text-align: right;
+}
+
+.block-input {    
+    text-align: left;
+}
+
+.block-row {    
+    display: flex;
+    text-align: left;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+}
+
+.block-ball {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
 }

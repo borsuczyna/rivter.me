@@ -1,4 +1,4 @@
-import { BlockDefinition, BlockType, findDefinition } from '../libs/lib';
+import { BlockDefinition, BlockNode, BlockType, findDefinition, findNode, NodeDefintion } from '../libs/lib';
 import { generateToken } from '../utils/token';
 import { cursorPosition } from '../window/cursor';
 import { getBoardFromEditorPosition } from './board';
@@ -30,6 +30,25 @@ export interface Block {
 
 export var blocks: Block[] = [];
 
+// Creating node DOM element
+function createNodeDOM(node: NodeDefintion, type: 'input' | 'output'): HTMLDivElement {
+    let htmlElement: HTMLDivElement = <HTMLDivElement> document.createElement('div');
+    let nodeName: HTMLDivElement = <HTMLDivElement> document.createElement('div');
+    let nodeBall: HTMLDivElement = <HTMLDivElement> document.createElement('div');
+    let blockNode: BlockNode | undefined = findNode(node.type);
+
+    nodeName.innerText = node.name;
+    htmlElement.appendChild(type == 'input' ? nodeBall : nodeName);
+    htmlElement.appendChild(type == 'input' ? nodeName : nodeBall);
+
+    nodeBall.style.backgroundColor = blockNode?.color.toDOM() || 'red';
+    nodeBall.classList.add('block-ball');
+    htmlElement.classList.add(`block-row`);
+    htmlElement.classList.add(`block-${type}`);
+
+    return htmlElement;
+}
+
 // Creating block DOM element
 function createBlockDOM(block: Block): HTMLDivElement {
     let definition: BlockDefinition | undefined = findDefinition(block.type);
@@ -55,9 +74,19 @@ function createBlockDOM(block: Block): HTMLDivElement {
     let blockInputs: HTMLDivElement = document.createElement('div');
     blockInputs.classList.add('block-inputs');
 
+    definition.inputs.forEach((value: NodeDefintion) => {
+        let htmlElement: HTMLDivElement = createNodeDOM(value, 'input');
+        blockInputs.appendChild(htmlElement);
+    });
+
     // Block outputs
     let blockOutputs: HTMLDivElement = document.createElement('div');
     blockOutputs.classList.add('block-outputs');
+
+    definition.outputs.forEach((value: NodeDefintion) => {
+        let htmlElement: HTMLDivElement = createNodeDOM(value, 'output');
+        blockOutputs.appendChild(htmlElement);
+    });
 
     // Append childs
     blockContent.appendChild(blockInputs);
