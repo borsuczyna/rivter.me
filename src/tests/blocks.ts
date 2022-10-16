@@ -55,21 +55,23 @@ expect('create block for testing frontend purposes', (): boolean => {
     return !!block;
 });
 
-// expect('clicking should create block on cursor position', async (): Promise<boolean> => {
-//     let promise = new Promise<boolean>((resolve, reject) => {
-//         let createBlockOnClick = () => {
-//             let block = createBlock('Player joined');
+expect('clicking should create block on cursor position', async (): Promise<boolean> => {
+    let promise = new Promise<boolean>((resolve, reject) => {
+        let createBlockOnClick = () => {
+            for(let i = 0; i < 50; i++) {
+                let block = createBlock('Player joined', getBoardFromEditorPosition(cursorPosition.x, cursorPosition.y).x + i*250, getBoardFromEditorPosition(cursorPosition.x, cursorPosition.y).y);
 
-//             resolve(
-//                 block.x == getBoardFromEditorPosition(cursorPosition.x, cursorPosition.y).x &&
-//                 block.y == getBoardFromEditorPosition(cursorPosition.x, cursorPosition.y).y
-//             )
+                resolve(
+                    block.x == getBoardFromEditorPosition(cursorPosition.x, cursorPosition.y).x &&
+                    block.y == getBoardFromEditorPosition(cursorPosition.x, cursorPosition.y).y
+                )
+            }
 
-//             removeEventListener('mousePressed', createBlockOnClick);
-//         }
+            // removeEventListener('mousePressed', createBlockOnClick);
+        }
 
-//         addEventListener('mousePressed', createBlockOnClick);
-//     });
+        addEventListener('mousePressed', createBlockOnClick);
+    });
 
-//     return await promise;
-// });
+    return await promise;
+});

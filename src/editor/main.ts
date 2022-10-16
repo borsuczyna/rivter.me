@@ -1,3 +1,5 @@
+import { triggerEvent } from "../utils/events";
+
 export interface EditorPosition {
     x: number;
     y: number;
@@ -36,6 +38,15 @@ export function setEditorZoom(zoom: number): void {
     editorRoot.style.setProperty('--board-zoom', `${editorZoom}`);
 }
 
+export function isRectOnScreen(rect: DOMRect) {
+    return (
+        rect.x + rect.width >= 0 &&
+        rect.y + rect.height >= 0 &&
+        rect.x <= editorDimensions.width &&
+        rect.y <= editorDimensions.height
+    );
+}
+
 function updateEditorDimensions(): void {
     let width = window.innerWidth;
     let height = window.innerHeight;
@@ -61,3 +72,10 @@ function initEditor(): void {
 }
 
 initEditor();
+
+function updateEditorEvent() {
+    requestAnimationFrame(updateEditorEvent);
+    triggerEvent('editorUpdate');
+}
+
+requestAnimationFrame(updateEditorEvent);

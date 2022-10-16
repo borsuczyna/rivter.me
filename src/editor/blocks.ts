@@ -1,6 +1,6 @@
 import { BlockDefinition, BlockNode, BlockType, findDefinition, findNode, NodeDefintion } from '../libs/lib';
 import { generateToken } from '../utils/token';
-import { cursorPosition } from '../window/cursor';
+import { cursorPosition, isCursorOnRect } from '../window/cursor';
 import { getBoardFromEditorPosition } from './board';
 import { editorWindow } from './main';
 
@@ -41,7 +41,7 @@ function createNodeDOM(node: NodeDefintion, type: 'input' | 'output'): HTMLDivEl
     htmlElement.appendChild(type == 'input' ? nodeBall : nodeName);
     htmlElement.appendChild(type == 'input' ? nodeName : nodeBall);
 
-    nodeBall.style.backgroundColor = blockNode?.color.toDOM() || 'red';
+    nodeBall.style.setProperty('--color', blockNode?.color.toDOM() || 'red');
     nodeBall.classList.add('block-ball');
     htmlElement.classList.add(`block-row`);
     htmlElement.classList.add(`block-${type}`);
@@ -99,7 +99,7 @@ function createBlockDOM(block: Block): HTMLDivElement {
 }
 
 // Get block DOM element
-function getBlockDOM(block: Block | string): HTMLDivElement {
+export function getBlockDOM(block: Block | string): HTMLDivElement {
     let blockElement: Block = getBlock(block);
     if(!blockElement) return;
 
@@ -186,5 +186,12 @@ export function destroyBlock(block: Block | string): boolean {
 
 // Get cursor under mouse
 export function getBlockUnderMouse(): Block | null {
+    for(let block of blocks) {
+        let rect: DOMRect = getBlockDOM(block).getBoundingClientRect();
+        if(isCursorOnRect(rect)) {
+            return block;
+        }
+    }
+
     return null;
 };

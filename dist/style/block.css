@@ -34,7 +34,7 @@
     display: flex;
     min-height: 0px;
     margin-top: 3px;
-    padding: 4px;
+    padding-block: 4px;
 
     border: 1px solid rgba(27, 27, 27, 0.234);
 }
@@ -65,10 +65,36 @@
     align-items: center;
     justify-content: flex-end;
     gap: 5px;
+    padding-inline: 5px;
 }
 
 .block-ball {
+    background: var(--color);
     width: 15px;
     height: 15px;
     border-radius: 50%;
+}
+
+.block-output .block-ball::after {
+    background: var(--color);
+
+    width:15px;
+    height: 15px;
+    border-radius: 50%;
+
+    content: "";
+    position: absolute;
+    transform: translate(35px);
+}
+
+.block-input .block-ball::after {
+    background: var(--color);
+
+    width:15px;
+    height: 15px;
+    border-radius: 50%;
+
+    content: "";
+    position: absolute;
+    transform: translate(-35px);
 }

@@ -3,6 +3,8 @@ import { getBlockUnderMouse } from "./blocks";
 import { editorDimensions, editorPosition, editorZoom, setEditorZoom, updateEditorPosition } from "./main";
 import { clamp } from '../utils/clamp';
 import { Position2D } from "../utils/position";
+import { isKeyDown } from "../window/keyboard";
+import { addEventHandler } from "../utils/events";
 
 export interface GrabBoard {
     active: boolean;
@@ -32,6 +34,15 @@ export function getBoardFromEditorPosition(x: number, y: number): Position2D {
 };
 
 function updateGrabBoard(): void {
+    grabBoard.active = (
+        isKeyDown(' ') &&
+        getBlockUnderMouse() == null
+    );
+
+    if(grabBoard.active) {
+        setCurrentCursor('grab');
+    }
+
     if(!grabBoard.holding) return;
 
     let difference: Position2D = {
@@ -46,29 +57,9 @@ function updateGrabBoard(): void {
     grabBoard.y = cursorPosition.y;
 
     updateEditorPosition();
-
-    requestAnimationFrame(updateGrabBoard);
 }
 
-addEventListener('keyPressed', (event): void => {
-    if(
-        (<CustomEvent>event).detail.key != ' ' ||
-        getBlockUnderMouse() != null
-    ) return;
-
-    setCurrentCursor('grab');
-    grabBoard.active = true;
-});
-
-addEventListener('keyReleased', (event): void => {
-    if(
-        (<CustomEvent>event).detail.key != ' ' ||
-        !grabBoard.active
-    ) return;
-
-    setCurrentCursor('default');
-    grabBoard.active = false;
-});
+addEventHandler('editorUpdate', updateGrabBoard, 1);
 
 addEventListener('mousePressed', (event): void => {
     if(
@@ -79,8 +70,6 @@ addEventListener('mousePressed', (event): void => {
     grabBoard.holding = true;
     grabBoard.x = cursorPosition.x;
     grabBoard.y = cursorPosition.y;
-
-    requestAnimationFrame(updateGrabBoard);
 });
 
 addEventListener('mouseReleased', (event): void => {
