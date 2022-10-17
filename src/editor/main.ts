@@ -1,3 +1,5 @@
+import './zoom';
+
 import { triggerEvent } from "../utils/events";
 
 export interface EditorPosition {
@@ -10,10 +12,10 @@ export interface EditorDimensions {
     height: number
 };
 
-export var editorCanvas: CanvasRenderingContext2D = null;
-export var editorWindow: HTMLElement = null;
-export var editorCursor: HTMLElement = null;
-export var editorRoot: HTMLElement = null;
+export var editorCanvas: CanvasRenderingContext2D | null = null;
+export var editorWindow: HTMLElement | null = null;
+export var editorCursor: HTMLElement | null = null;
+export var editorRoot: HTMLElement | null = null;
 
 export var editorDimensions: EditorDimensions = {
     width: 1280,
@@ -28,13 +30,16 @@ export var editorPosition: EditorPosition = {
 export var editorZoom: number = 1;
 
 export function updateEditorPosition(): void {
+    if(!editorRoot) return;
+
     editorRoot.style.setProperty('--board-x', `${editorPosition.x}px`);
     editorRoot.style.setProperty('--board-y', `${editorPosition.y}px`);
 }
 
 export function setEditorZoom(zoom: number): void {
+    if(!editorRoot) return;
+
     editorZoom = zoom;
-    
     editorRoot.style.setProperty('--board-zoom', `${editorZoom}`);
 }
 
@@ -48,6 +53,8 @@ export function isRectOnScreen(rect: DOMRect) {
 }
 
 function updateEditorDimensions(): void {
+    if(!editorCanvas) return;
+
     let width = window.innerWidth;
     let height = window.innerHeight;
 

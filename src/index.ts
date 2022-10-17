@@ -2,14 +2,14 @@
 import './libs/MTA-server';
 
 import './editor/main';
-import './editor/blocks';
-import './editor/board';
+import './editor/blocks/main';
+import './editor/blocks/interaction';
+import './editor/board/main';
 import './window/cursor';
 import './window/keyboard';
-import './editor/block-interaction';
 
 // Unit tests
 import './tests/blocks';
 
 // Debug
-import './editor/debug';
+import './debug/main';

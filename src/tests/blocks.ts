@@ -1,5 +1,5 @@
-import { Block, createBlock, destroyBlock } from '../editor/blocks';
-import { getBoardFromEditorPosition } from '../editor/board';
+import { Block, createBlock, destroyBlock } from '../editor/blocks/main';
+import { getBoardFromEditorPosition } from '../editor/board/main';
 import { cursorPosition } from '../window/cursor';
 import { expect } from './test';
 
@@ -19,8 +19,9 @@ expect('destroy block via token', (): boolean => {
 });
 
 expect('destroy invalid block', (): boolean => {
-    return !destroyBlock(null);
-})
+    // @ts-ignore
+    return !destroyBlock(<Block> undefined);
+});
 
 expect('create block at 50x50 position', (): boolean => {
     block = createBlock('Player joined', 50, 50);
@@ -42,11 +43,11 @@ expect('created block should create DOM element', (): boolean => {
 
 expect('destroying block should delete DOM element', (): boolean => {
     block = createBlock('Player joined', 50, 50);
-    let preDOM = document.getElementById(`block-${block.token}`);
+    let preDOM: HTMLElement | null = document.getElementById(`block-${block.token}`);
     destroyBlock(block);
-    let postDOM = document.getElementById(`block-${block.token}`);
+    let postDOM: HTMLElement | null = document.getElementById(`block-${block.token}`);
 
-    return preDOM && !postDOM;
+    return (preDOM && !postDOM) || false;
 });
 
 expect('create block for testing frontend purposes', (): boolean => {
@@ -55,21 +56,21 @@ expect('create block for testing frontend purposes', (): boolean => {
     return !!block;
 });
 
-// expect('clicking should create block on cursor position', async (): Promise<boolean> => {
-//     let promise = new Promise<boolean>((resolve, reject) => {
-//         let createBlockOnClick = () => {
-//             let block = createBlock('Player joined');
+expect('clicking should create block on cursor position', async (): Promise<boolean> => {
+    let promise = new Promise<boolean>((resolve, reject) => {
+        let createBlockOnClick = () => {
+            let block = createBlock('Player joined');
 
-//             resolve(
-//                 block.x == getBoardFromEditorPosition(cursorPosition.x, cursorPosition.y).x &&
-//                 block.y == getBoardFromEditorPosition(cursorPosition.x, cursorPosition.y).y
-//             )
+            resolve(
+                block.x == getBoardFromEditorPosition(cursorPosition.x, cursorPosition.y).x &&
+                block.y == getBoardFromEditorPosition(cursorPosition.x, cursorPosition.y).y
+            )
 
-//             removeEventListener('mousePressed', createBlockOnClick);
-//         }
+            removeEventListener('mousePressed', createBlockOnClick);
+        }
 
-//         addEventListener('mousePressed', createBlockOnClick);
-//     });
+        addEventListener('mousePressed', createBlockOnClick);
+    });
 
-//     return await promise;
-// });
+    return await promise;
+});

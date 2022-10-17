@@ -535,17 +535,17 @@ function hmrAcceptRun(bundle, id) {
 // Definitions
 var _mtaServer = require("./libs/MTA-server");
 var _main = require("./editor/main");
-var _blocks = require("./editor/blocks");
-var _board = require("./editor/board");
+var _main1 = require("./editor/blocks/main");
+var _interaction = require("./editor/blocks/interaction");
+var _main2 = require("./editor/board/main");
 var _cursor = require("./window/cursor");
 var _keyboard = require("./window/keyboard");
-var _blockInteraction = require("./editor/block-interaction");
 // Unit tests
-var _blocks1 = require("./tests/blocks");
+var _blocks = require("./tests/blocks");
 // Debug
-var _debug = require("./editor/debug");
+var _main3 = require("./debug/main");
 
-},{"./libs/MTA-server":"fv6v7","./editor/main":"i8xue","./editor/blocks":"izl7W","./editor/board":"6Wtda","./window/cursor":"8IR6J","./window/keyboard":"24Wyb","./editor/block-interaction":"bBuh0","./tests/blocks":"1pXVf","./editor/debug":"9RaM0"}],"fv6v7":[function(require,module,exports) {
+},{"./libs/MTA-server":"fv6v7","./editor/main":"i8xue","./window/cursor":"8IR6J","./window/keyboard":"24Wyb","./tests/blocks":"1pXVf","./debug/main":"4gzLn","./editor/blocks/main":"gvfQM","./editor/board/main":"25mxR","./editor/blocks/interaction":"8Udq5"}],"fv6v7":[function(require,module,exports) {
 var _color = require("../utils/color");
 var _lib = require("./lib");
 const definitions = {
@@ -665,6 +665,7 @@ parcelHelpers.export(exports, "editorZoom", ()=>editorZoom);
 parcelHelpers.export(exports, "updateEditorPosition", ()=>updateEditorPosition);
 parcelHelpers.export(exports, "setEditorZoom", ()=>setEditorZoom);
 parcelHelpers.export(exports, "isRectOnScreen", ()=>isRectOnScreen);
+var _zoom = require("./zoom");
 var _events = require("../utils/events");
 var editorCanvas = null;
 var editorWindow = null;
@@ -680,10 +681,12 @@ var editorPosition = {
 };
 var editorZoom = 1;
 function updateEditorPosition() {
+    if (!editorRoot) return;
     editorRoot.style.setProperty("--board-x", `${editorPosition.x}px`);
     editorRoot.style.setProperty("--board-y", `${editorPosition.y}px`);
 }
 function setEditorZoom(zoom) {
+    if (!editorRoot) return;
     editorZoom = zoom;
     editorRoot.style.setProperty("--board-zoom", `${editorZoom}`);
 }
@@ -691,6 +694,7 @@ function isRectOnScreen(rect) {
     return rect.x + rect.width >= 0 && rect.y + rect.height >= 0 && rect.x <= editorDimensions.width && rect.y <= editorDimensions.height;
 }
 function updateEditorDimensions() {
+    if (!editorCanvas) return;
     let width = window.innerWidth;
     let height = window.innerHeight;
     editorDimensions.width = width;
@@ -715,7 +719,7 @@ function updateEditorEvent() {
 }
 requestAnimationFrame(updateEditorEvent);
 
-},{"../utils/events":"5W5Qt","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5W5Qt":[function(require,module,exports) {
+},{"../utils/events":"5W5Qt","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./zoom":"5ga2k"}],"5W5Qt":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "addEventHandler", ()=>addEventHandler);
@@ -735,156 +739,19 @@ function triggerEvent(name, ...args) {
     });
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"izl7W":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "blocks", ()=>blocks);
-// Get block DOM element
-parcelHelpers.export(exports, "getBlockDOM", ()=>getBlockDOM);
-// Updating single block DOM
-parcelHelpers.export(exports, "updateBlockDOM", ()=>updateBlockDOM);
-// Updating all blocks DOM's
-parcelHelpers.export(exports, "updateBlocksDOM", ()=>updateBlocksDOM);
-// Creating blocks
-parcelHelpers.export(exports, "createBlock", ()=>createBlock);
-// Get block by Block or token
-parcelHelpers.export(exports, "getBlock", ()=>getBlock);
-// Destroying blocks
-parcelHelpers.export(exports, "destroyBlock", ()=>destroyBlock);
-// Get cursor under mouse
-parcelHelpers.export(exports, "getBlockUnderMouse", ()=>getBlockUnderMouse);
-var _lib = require("../libs/lib");
-var _token = require("../utils/token");
-var _cursor = require("../window/cursor");
-var _board = require("./board");
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5ga2k":[function(require,module,exports) {
+var _clamp = require("../utils/clamp");
 var _main = require("./main");
-var blocks = [];
-// Creating node DOM element
-function createNodeDOM(node, type) {
-    let htmlElement = document.createElement("div");
-    let nodeName = document.createElement("div");
-    let nodeBall = document.createElement("div");
-    let blockNode = (0, _lib.findNode)(node.type);
-    nodeName.innerText = node.name;
-    htmlElement.appendChild(type == "input" ? nodeBall : nodeName);
-    htmlElement.appendChild(type == "input" ? nodeName : nodeBall);
-    nodeBall.style.setProperty("--color", blockNode?.color.toDOM() || "red");
-    nodeBall.classList.add("block-ball");
-    htmlElement.classList.add(`block-row`);
-    htmlElement.classList.add(`block-${type}`);
-    return htmlElement;
-}
-// Creating block DOM element
-function createBlockDOM(block) {
-    let definition = (0, _lib.findDefinition)(block.type);
-    if (!definition) return;
-    let htmlElement = document.createElement("div");
-    // Block element
-    htmlElement.classList.add("block-element");
-    htmlElement.id = `block-${block.token}`;
-    (0, _main.editorWindow).appendChild(htmlElement);
-    // Block title
-    let title = document.createElement("div");
-    title.innerText = definition.name;
-    title.classList.add("block-title");
-    // Block content
-    let blockContent = document.createElement("div");
-    blockContent.classList.add("block-content");
-    // Block inputs
-    let blockInputs = document.createElement("div");
-    blockInputs.classList.add("block-inputs");
-    definition.inputs.forEach((value)=>{
-        let htmlElement = createNodeDOM(value, "input");
-        blockInputs.appendChild(htmlElement);
-    });
-    // Block outputs
-    let blockOutputs = document.createElement("div");
-    blockOutputs.classList.add("block-outputs");
-    definition.outputs.forEach((value)=>{
-        let htmlElement = createNodeDOM(value, "output");
-        blockOutputs.appendChild(htmlElement);
-    });
-    // Append childs
-    blockContent.appendChild(blockInputs);
-    blockContent.appendChild(blockOutputs);
-    htmlElement.appendChild(title);
-    htmlElement.appendChild(blockContent);
-    return htmlElement;
-}
-function getBlockDOM(block) {
-    let blockElement = getBlock(block);
-    if (!blockElement) return;
-    let htmlElement = document.getElementById(`block-${blockElement.token}`);
-    if (!htmlElement) htmlElement = createBlockDOM(blockElement);
-    return htmlElement;
-}
-// Destroying block DOM element
-function destroyBlockDOM(block) {
-    let htmlElement = getBlockDOM(block);
-    if (!htmlElement) return;
-    htmlElement.remove();
-}
-function updateBlockDOM(block) {
-    let htmlElement = getBlockDOM(block);
-    let blockElement = getBlock(block);
-    if (!htmlElement) return;
-    htmlElement.style.setProperty("--position-x", `${blockElement.x}px`);
-    htmlElement.style.setProperty("--position-y", `${blockElement.y}px`);
-}
-function updateBlocksDOM() {
-    for (let block of blocks)updateBlockDOM(block);
-}
-function createBlock(type, x, y) {
-    x = x || (0, _board.getBoardFromEditorPosition)((0, _cursor.cursorPosition).x, (0, _cursor.cursorPosition).y).x;
-    y = y || (0, _board.getBoardFromEditorPosition)((0, _cursor.cursorPosition).x, (0, _cursor.cursorPosition).y).y;
-    let block = {
-        token: (0, _token.generateToken)(),
-        type: type,
-        inputNodes: [],
-        outputNodes: [],
-        x: x,
-        y: y
-    };
-    blocks.push(block);
-    // Update block DOM
-    updateBlockDOM(block);
-    return block;
-}
-function getBlock(block) {
-    if (typeof block != "string") return block;
-    else return blocks.find((value)=>value.token == block);
-}
-function destroyBlock(block) {
-    destroyBlockDOM(block);
-    if (typeof block == "string") {
-        blocks = blocks.filter((value, index)=>value.token != block);
-        return true;
-    } else {
-        const blockIndex = blocks.indexOf(block);
-        if (blockIndex !== -1) {
-            blocks.splice(blockIndex, 1);
-            return true;
-        }
-    }
-    return false;
-}
-function getBlockUnderMouse() {
-    for (let block of blocks){
-        let rect = getBlockDOM(block).getBoundingClientRect();
-        if ((0, _cursor.isCursorOnRect)(rect)) return block;
-    }
-    return null;
-}
+addEventListener("wheel", (event)=>{
+    (0, _main.setEditorZoom)((0, _clamp.clamp)((0, _main.editorZoom) - event.deltaY / 400, 0.2, 4));
+});
 
-},{"../libs/lib":"4fQhG","../utils/token":"9cRK6","../window/cursor":"8IR6J","./board":"6Wtda","./main":"i8xue","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"9cRK6":[function(require,module,exports) {
+},{"../utils/clamp":"7Y4oV","./main":"i8xue"}],"7Y4oV":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "generateToken", ()=>generateToken);
-const characters = "qwsertyuiopasdfghjklzxcvbnbmQWERETYUIOPASDFDGHJKJLZXCXVBNBM123454567890";
-function generateToken(length = 16) {
-    let final = "";
-    while(final.length < length)final += characters.charAt(Math.random() * characters.length);
-    return final;
+parcelHelpers.export(exports, "clamp", ()=>clamp);
+function clamp(current, min, max) {
+    return Math.min(Math.max(current, min), max);
 }
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"8IR6J":[function(require,module,exports) {
@@ -933,74 +800,7 @@ function resetCursorToDefault() {
 }
 (0, _events.addEventHandler)("editorUpdate", resetCursorToDefault, 1000);
 
-},{"../editor/main":"i8xue","../utils/events":"5W5Qt","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"6Wtda":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "grabBoard", ()=>grabBoard);
-parcelHelpers.export(exports, "getEditorFromBoardPosition", ()=>getEditorFromBoardPosition);
-parcelHelpers.export(exports, "getBoardFromEditorPosition", ()=>getBoardFromEditorPosition);
-var _cursor = require("../window/cursor");
-var _blocks = require("./blocks");
-var _main = require("./main");
-var _clamp = require("../utils/clamp");
-var _keyboard = require("../window/keyboard");
-var _events = require("../utils/events");
-var grabBoard = {
-    active: false,
-    holding: false,
-    x: 0,
-    y: 0
-};
-function getEditorFromBoardPosition(x, y) {
-    return {
-        x: (0, _main.editorDimensions).width / 2 + (0, _main.editorPosition).x * (0, _main.editorZoom) + x * (0, _main.editorZoom),
-        y: (0, _main.editorDimensions).height / 2 + (0, _main.editorPosition).y * (0, _main.editorZoom) + y * (0, _main.editorZoom)
-    };
-}
-function getBoardFromEditorPosition(x, y) {
-    return {
-        x: (x - (0, _main.editorDimensions).width / 2 - (0, _main.editorPosition).x * (0, _main.editorZoom)) / (0, _main.editorZoom),
-        y: (y - (0, _main.editorDimensions).height / 2 - (0, _main.editorPosition).y * (0, _main.editorZoom)) / (0, _main.editorZoom)
-    };
-}
-function updateGrabBoard() {
-    grabBoard.active = (0, _keyboard.isKeyDown)(" ") && (0, _blocks.getBlockUnderMouse)() == null;
-    if (grabBoard.active) (0, _cursor.setCurrentCursor)("grab");
-    if (!grabBoard.holding) return;
-    let difference = {
-        x: (0, _cursor.cursorPosition).x - grabBoard.x,
-        y: (0, _cursor.cursorPosition).y - grabBoard.y
-    };
-    (0, _main.editorPosition).x += difference.x / (0, _main.editorZoom);
-    (0, _main.editorPosition).y += difference.y / (0, _main.editorZoom);
-    grabBoard.x = (0, _cursor.cursorPosition).x;
-    grabBoard.y = (0, _cursor.cursorPosition).y;
-    (0, _main.updateEditorPosition)();
-}
-(0, _events.addEventHandler)("editorUpdate", updateGrabBoard, 1);
-addEventListener("mousePressed", (event)=>{
-    if (event.detail.button != 0 || !grabBoard.active) return;
-    grabBoard.holding = true;
-    grabBoard.x = (0, _cursor.cursorPosition).x;
-    grabBoard.y = (0, _cursor.cursorPosition).y;
-});
-addEventListener("mouseReleased", (event)=>{
-    if (event.detail.button != 0 || !grabBoard.holding) return;
-    grabBoard.holding = false;
-});
-addEventListener("wheel", (event)=>{
-    (0, _main.setEditorZoom)((0, _clamp.clamp)((0, _main.editorZoom) - event.deltaY / 400, 0.2, 4));
-});
-
-},{"../window/cursor":"8IR6J","./blocks":"izl7W","./main":"i8xue","../utils/clamp":"7Y4oV","../window/keyboard":"24Wyb","../utils/events":"5W5Qt","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"7Y4oV":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "clamp", ()=>clamp);
-function clamp(current, min, max) {
-    return Math.min(Math.max(current, min), max);
-}
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"24Wyb":[function(require,module,exports) {
+},{"../editor/main":"i8xue","../utils/events":"5W5Qt","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"24Wyb":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "isKeyDown", ()=>isKeyDown);
@@ -1027,89 +827,62 @@ addEventListener("keyup", (e)=>{
     window.dispatchEvent(event);
 });
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bBuh0":[function(require,module,exports) {
-var _events = require("../utils/events");
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"1pXVf":[function(require,module,exports) {
+var _main = require("../editor/blocks/main");
+var _main1 = require("../editor/board/main");
 var _cursor = require("../window/cursor");
-var _blocks = require("./blocks");
-var _board = require("./board");
-var _main = require("./main");
-function isBlockOnScreen(block) {
-    let htmlElement = (0, _blocks.getBlockDOM)(block);
-    if (!htmlElement) return;
-    return (0, _main.isRectOnScreen)(htmlElement.getBoundingClientRect());
-}
-function updateBlockInteractions() {
-    let resetToDefault = true;
-    for (let block of (0, _blocks.blocks)){
-        let onScreen = isBlockOnScreen(block);
-        if (!onScreen) continue;
-        // Grabbing block by title name
-        let htmlElement = (0, _blocks.getBlockDOM)(block);
-        let title = htmlElement.querySelector(".block-title");
-        let titleRect = title.getBoundingClientRect();
-        if ((0, _main.isRectOnScreen)(titleRect) && (0, _cursor.isCursorOnRect)(titleRect) && !(0, _board.grabBoard).holding) {
-            (0, _cursor.setCurrentCursor)("grab");
-            resetToDefault = false;
-        }
-    }
-}
-(0, _events.addEventHandler)("editorUpdate", updateBlockInteractions, 0);
-
-},{"../utils/events":"5W5Qt","../window/cursor":"8IR6J","./blocks":"izl7W","./board":"6Wtda","./main":"i8xue"}],"1pXVf":[function(require,module,exports) {
-var _blocks = require("../editor/blocks");
 var _test = require("./test");
 var block;
 (0, _test.expect)("create block", ()=>{
-    block = (0, _blocks.createBlock)("Player joined");
+    block = (0, _main.createBlock)("Player joined");
     return block.type == "Player joined";
 });
 (0, _test.expect)("destroy block", ()=>{
-    return (0, _blocks.destroyBlock)(block);
+    return (0, _main.destroyBlock)(block);
 });
 (0, _test.expect)("destroy block via token", ()=>{
-    return (0, _blocks.destroyBlock)(block.token);
+    return (0, _main.destroyBlock)(block.token);
 });
 (0, _test.expect)("destroy invalid block", ()=>{
-    return !(0, _blocks.destroyBlock)(null);
+    // @ts-ignore
+    return !(0, _main.destroyBlock)(undefined);
 });
 (0, _test.expect)("create block at 50x50 position", ()=>{
-    block = (0, _blocks.createBlock)("Player joined", 50, 50);
+    block = (0, _main.createBlock)("Player joined", 50, 50);
     let success = block.x == 50 && block.y == 50;
-    (0, _blocks.destroyBlock)(block);
+    (0, _main.destroyBlock)(block);
     return success;
 });
 (0, _test.expect)("created block should create DOM element", ()=>{
-    block = (0, _blocks.createBlock)("Player joined", 50, 50);
+    block = (0, _main.createBlock)("Player joined", 50, 50);
     let DOM = document.getElementById(`block-${block.token}`);
-    (0, _blocks.destroyBlock)(block);
+    (0, _main.destroyBlock)(block);
     return !!DOM;
 });
 (0, _test.expect)("destroying block should delete DOM element", ()=>{
-    block = (0, _blocks.createBlock)("Player joined", 50, 50);
+    block = (0, _main.createBlock)("Player joined", 50, 50);
     let preDOM = document.getElementById(`block-${block.token}`);
-    (0, _blocks.destroyBlock)(block);
+    (0, _main.destroyBlock)(block);
     let postDOM = document.getElementById(`block-${block.token}`);
-    return preDOM && !postDOM;
+    return preDOM && !postDOM || false;
 });
 (0, _test.expect)("create block for testing frontend purposes", ()=>{
-    block = (0, _blocks.createBlock)("Player joined", 50, 50);
+    block = (0, _main.createBlock)("Player joined", 50, 50);
     return !!block;
-}); // expect('clicking should create block on cursor position', async (): Promise<boolean> => {
- //     let promise = new Promise<boolean>((resolve, reject) => {
- //         let createBlockOnClick = () => {
- //             let block = createBlock('Player joined');
- //             resolve(
- //                 block.x == getBoardFromEditorPosition(cursorPosition.x, cursorPosition.y).x &&
- //                 block.y == getBoardFromEditorPosition(cursorPosition.x, cursorPosition.y).y
- //             )
- //             removeEventListener('mousePressed', createBlockOnClick);
- //         }
- //         addEventListener('mousePressed', createBlockOnClick);
- //     });
- //     return await promise;
- // });
+});
+(0, _test.expect)("clicking should create block on cursor position", async ()=>{
+    let promise = new Promise((resolve, reject)=>{
+        let createBlockOnClick = ()=>{
+            let block = (0, _main.createBlock)("Player joined");
+            resolve(block.x == (0, _main1.getBoardFromEditorPosition)((0, _cursor.cursorPosition).x, (0, _cursor.cursorPosition).y).x && block.y == (0, _main1.getBoardFromEditorPosition)((0, _cursor.cursorPosition).x, (0, _cursor.cursorPosition).y).y);
+            removeEventListener("mousePressed", createBlockOnClick);
+        };
+        addEventListener("mousePressed", createBlockOnClick);
+    });
+    return await promise;
+});
 
-},{"../editor/blocks":"izl7W","./test":"6j4B9"}],"6j4B9":[function(require,module,exports) {
+},{"./test":"6j4B9","../editor/blocks/main":"gvfQM","../editor/board/main":"25mxR","../window/cursor":"8IR6J"}],"6j4B9":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "expect", ()=>expect);
@@ -1133,43 +906,187 @@ async function expect(message, callback) {
     }
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"9RaM0":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gvfQM":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "blocks", ()=>blocks);
+// Get block DOM element
+parcelHelpers.export(exports, "getBlockDOM", ()=>getBlockDOM);
+// Updating single block DOM
+parcelHelpers.export(exports, "updateBlockDOM", ()=>updateBlockDOM);
+// Updating all blocks DOM's
+parcelHelpers.export(exports, "updateBlocksDOM", ()=>updateBlocksDOM);
+// Creating blocks
+parcelHelpers.export(exports, "createBlock", ()=>createBlock);
+// Get block by Block or token
+parcelHelpers.export(exports, "getBlock", ()=>getBlock);
+// Destroying blocks
+parcelHelpers.export(exports, "destroyBlock", ()=>destroyBlock);
+var _lib = require("../../libs/lib");
+var _token = require("../../utils/token");
+var _cursor = require("../../window/cursor");
+var _main = require("../board/main");
+var _main1 = require("../main");
+var blocks = [];
+// Creating node DOM element
+function createNodeDOM(node, type) {
+    let htmlElement = document.createElement("div");
+    let nodeName = document.createElement("div");
+    let nodeBall = document.createElement("div");
+    let blockNode = (0, _lib.findNode)(node.type);
+    nodeName.innerText = node.name;
+    htmlElement.appendChild(type == "input" ? nodeBall : nodeName);
+    htmlElement.appendChild(type == "input" ? nodeName : nodeBall);
+    nodeBall.style.setProperty("--color", blockNode?.color.toDOM() || "red");
+    nodeBall.classList.add("block-ball");
+    htmlElement.classList.add(`block-row`);
+    htmlElement.classList.add(`block-${type}`);
+    return htmlElement;
+}
+// Creating block DOM element
+function createBlockDOM(block) {
+    let definition = (0, _lib.findDefinition)(block.type);
+    if (!(0, _main1.editorWindow) || !definition) return;
+    let htmlElement = document.createElement("div");
+    // Block element
+    htmlElement.classList.add("block-element");
+    htmlElement.id = `block-${block.token}`;
+    (0, _main1.editorWindow).appendChild(htmlElement);
+    // Block title
+    let title = document.createElement("div");
+    title.innerText = definition.name;
+    title.classList.add("block-title");
+    // Block content
+    let blockContent = document.createElement("div");
+    blockContent.classList.add("block-content");
+    // Block inputs
+    let blockInputs = document.createElement("div");
+    blockInputs.classList.add("block-inputs");
+    definition.inputs.forEach((value)=>{
+        let htmlElement = createNodeDOM(value, "input");
+        blockInputs.appendChild(htmlElement);
+    });
+    // Block outputs
+    let blockOutputs = document.createElement("div");
+    blockOutputs.classList.add("block-outputs");
+    definition.outputs.forEach((value)=>{
+        let htmlElement = createNodeDOM(value, "output");
+        blockOutputs.appendChild(htmlElement);
+    });
+    // Append childs
+    blockContent.appendChild(blockInputs);
+    blockContent.appendChild(blockOutputs);
+    htmlElement.appendChild(title);
+    htmlElement.appendChild(blockContent);
+    return htmlElement;
+}
+function getBlockDOM(block) {
+    let blockElement = getBlock(block);
+    if (!blockElement) return;
+    let htmlElement = document.getElementById(`block-${blockElement.token}`);
+    if (!htmlElement) htmlElement = createBlockDOM(blockElement);
+    return htmlElement;
+}
+// Destroying block DOM element
+function destroyBlockDOM(block) {
+    let htmlElement = getBlockDOM(block);
+    if (!htmlElement) return;
+    htmlElement.remove();
+}
+function updateBlockDOM(block) {
+    let htmlElement = getBlockDOM(block);
+    let blockElement = getBlock(block);
+    if (!htmlElement || !blockElement) return;
+    htmlElement.style.setProperty("--position-x", `${blockElement.x}px`);
+    htmlElement.style.setProperty("--position-y", `${blockElement.y}px`);
+}
+function updateBlocksDOM() {
+    for (let block of blocks)updateBlockDOM(block);
+}
+function createBlock(type, x, y) {
+    x = x || (0, _main.getBoardFromEditorPosition)((0, _cursor.cursorPosition).x, (0, _cursor.cursorPosition).y).x;
+    y = y || (0, _main.getBoardFromEditorPosition)((0, _cursor.cursorPosition).x, (0, _cursor.cursorPosition).y).y;
+    let block = {
+        token: (0, _token.generateToken)(),
+        type: type,
+        inputNodes: [],
+        outputNodes: [],
+        x: x,
+        y: y
+    };
+    blocks.push(block);
+    // Update block DOM
+    updateBlockDOM(block);
+    return block;
+}
+function getBlock(block) {
+    if (typeof block != "string") return block;
+    else return blocks.find((value)=>value.token == block);
+}
+function destroyBlock(block) {
+    if (!block) return false;
+    destroyBlockDOM(block);
+    if (typeof block == "string") {
+        blocks = blocks.filter((value, index)=>value.token != block);
+        return true;
+    } else {
+        const blockIndex = blocks.indexOf(block);
+        if (blockIndex !== -1) {
+            blocks.splice(blockIndex, 1);
+            return true;
+        }
+    }
+    return false;
+}
+
+},{"../../libs/lib":"4fQhG","../../utils/token":"9cRK6","../../window/cursor":"8IR6J","../board/main":"25mxR","../main":"i8xue","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"9cRK6":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "generateToken", ()=>generateToken);
+const characters = "qwsertyuiopasdfghjklzxcvbnbmQWERETYUIOPASDFDGHJKJLZXCXVBNBM123454567890";
+function generateToken(length = 16) {
+    let final = "";
+    while(final.length < length)final += characters.charAt(Math.random() * characters.length);
+    return final;
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"25mxR":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "grabBoard", ()=>grabBoard);
+parcelHelpers.export(exports, "getEditorFromBoardPosition", ()=>getEditorFromBoardPosition);
+parcelHelpers.export(exports, "getBoardFromEditorPosition", ()=>getBoardFromEditorPosition);
+var _main = require("../main");
+var grabBoard = {
+    active: false,
+    holding: false,
+    x: 0,
+    y: 0
+};
+function getEditorFromBoardPosition(x, y) {
+    return {
+        x: (0, _main.editorDimensions).width / 2 + (0, _main.editorPosition).x * (0, _main.editorZoom) + x * (0, _main.editorZoom),
+        y: (0, _main.editorDimensions).height / 2 + (0, _main.editorPosition).y * (0, _main.editorZoom) + y * (0, _main.editorZoom)
+    };
+}
+function getBoardFromEditorPosition(x, y) {
+    return {
+        x: (x - (0, _main.editorDimensions).width / 2 - (0, _main.editorPosition).x * (0, _main.editorZoom)) / (0, _main.editorZoom),
+        y: (y - (0, _main.editorDimensions).height / 2 - (0, _main.editorPosition).y * (0, _main.editorZoom)) / (0, _main.editorZoom)
+    };
+}
+
+},{"../main":"i8xue","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4gzLn":[function(require,module,exports) {
 var _events = require("../utils/events");
-var _main = require("./main");
+var _main = require("../editor/main");
+var _graph = require("./graph");
 const debugData = {
     lastFrame: new Date(),
     frameTime: [],
     fps: []
 };
-function drawDebugGraph(x, y, width, height, graph, amount = 10, minimalMax = null) {
-    graph = graph.slice(-amount);
-    amount = graph.length;
-    (0, _main.editorCanvas).fillStyle = "white";
-    (0, _main.editorCanvas).strokeStyle = "white";
-    (0, _main.editorCanvas).lineWidth = 1;
-    (0, _main.editorCanvas).strokeRect(x, y, width, height);
-    let min = 0; // Math.min(...graph);
-    let max = Math.max(...graph, minimalMax);
-    (0, _main.editorCanvas).font = "8px 'Open Sans', sans-serif";
-    for(let i = 0; i < 5; i++){
-        let progress = i / 4;
-        (0, _main.editorCanvas).fillText(Math.floor(max + (min - max) * progress).toString(), x - 13, y + 3 + (height - 6) * progress);
-    }
-    (0, _main.editorCanvas).beginPath();
-    let moved = false;
-    for(let point = 0; point < amount; point++){
-        let progress1 = point / (amount - 1);
-        let targetX = x + progress1 * width;
-        let targetY = y + height - height * (graph[point] / max);
-        if (!moved) {
-            (0, _main.editorCanvas).moveTo(targetX, targetY);
-            moved = true;
-        }
-        (0, _main.editorCanvas).lineTo(targetX, targetY);
-    }
-    (0, _main.editorCanvas).stroke();
-}
 (0, _events.addEventHandler)("editorUpdate", ()=>{
+    if (!(0, _main.editorCanvas)) return;
     (0, _main.editorCanvas).clearRect(0, 0, (0, _main.editorDimensions).width, (0, _main.editorDimensions).height);
     let frameTime = new Date().getTime() - debugData.lastFrame.getTime();
     debugData.frameTime.push(frameTime);
@@ -1178,12 +1095,84 @@ function drawDebugGraph(x, y, width, height, graph, amount = 10, minimalMax = nu
     (0, _main.editorCanvas).fillStyle = "#FFffffCC";
     (0, _main.editorCanvas).textBaseline = "middle";
     (0, _main.editorCanvas).fillText("frame time", 20, 15);
-    drawDebugGraph(20, 25, 250, 130, debugData.frameTime, 100, 50);
+    (0, _graph.drawGraph)((0, _main.editorCanvas), 20, 25, 250, 130, debugData.frameTime, 100, 50);
     (0, _main.editorCanvas).fillText("fps", 20, 175);
-    drawDebugGraph(20, 185, 250, 130, debugData.fps, 100, 80);
+    (0, _graph.drawGraph)((0, _main.editorCanvas), 20, 185, 250, 130, debugData.fps, 100, 80);
     debugData.lastFrame = new Date();
 }, 999);
 
-},{"../utils/events":"5W5Qt","./main":"i8xue"}]},["iJYvl","h7u1C"], "h7u1C", "parcelRequire94c2")
+},{"../utils/events":"5W5Qt","../editor/main":"i8xue","./graph":"bCvH6"}],"bCvH6":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "drawGraph", ()=>drawGraph);
+function drawGraph(ctx, x, y, width, height, graph, amount = 10, minimalMax = null) {
+    graph = graph.slice(-amount);
+    amount = graph.length;
+    ctx.fillStyle = "white";
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x, y, width, height);
+    let min = 0; // Math.min(...graph);
+    let max = Math.max(...graph, minimalMax || 0);
+    ctx.font = "8px 'Open Sans', sans-serif";
+    for(let i = 0; i < 5; i++){
+        let progress = i / 4;
+        ctx.fillText(Math.floor(max + (min - max) * progress).toString(), x - 13, y + 3 + (height - 6) * progress);
+    }
+    ctx.beginPath();
+    let moved = false;
+    for(let point = 0; point < amount; point++){
+        let progress1 = point / (amount - 1);
+        let targetX = x + progress1 * width;
+        let targetY = y + height - height * (graph[point] / max);
+        if (!moved) {
+            ctx.moveTo(targetX, targetY);
+            moved = true;
+        }
+        ctx.lineTo(targetX, targetY);
+    }
+    ctx.stroke();
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"8Udq5":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+// Get block under mouse
+parcelHelpers.export(exports, "getBlockUnderMouse", ()=>getBlockUnderMouse);
+var _events = require("../../utils/events");
+var _cursor = require("../../window/cursor");
+var _main = require("../blocks/main");
+var _main1 = require("../board/main");
+var _main2 = require("../main");
+function getBlockUnderMouse() {
+    for (let block of (0, _main.blocks)){
+        let rect = (0, _main.getBlockDOM)(block)?.getBoundingClientRect();
+        if (rect && (0, _cursor.isCursorOnRect)(rect)) return block;
+    }
+    return null;
+}
+function isBlockOnScreen(block) {
+    let htmlElement = (0, _main.getBlockDOM)(block);
+    if (!htmlElement) return false;
+    return (0, _main2.isRectOnScreen)(htmlElement.getBoundingClientRect());
+}
+function updateBlockInteractions() {
+    let resetToDefault = true;
+    for (let block of (0, _main.blocks)){
+        let onScreen = isBlockOnScreen(block);
+        if (!onScreen) continue;
+        // Grabbing block by title name
+        let htmlElement = (0, _main.getBlockDOM)(block);
+        let title = htmlElement?.querySelector(".block-title");
+        let titleRect = title?.getBoundingClientRect();
+        if (titleRect && (0, _main2.isRectOnScreen)(titleRect) && (0, _cursor.isCursorOnRect)(titleRect) && !(0, _main1.grabBoard).holding) {
+            (0, _cursor.setCurrentCursor)("grab");
+            resetToDefault = false;
+        }
+    }
+}
+(0, _events.addEventHandler)("editorUpdate", updateBlockInteractions, 0);
+
+},{"../../utils/events":"5W5Qt","../../window/cursor":"8IR6J","../blocks/main":"gvfQM","../board/main":"25mxR","../main":"i8xue","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["iJYvl","h7u1C"], "h7u1C", "parcelRequire94c2")
 
 //# sourceMappingURL=index.b71e74eb.js.map

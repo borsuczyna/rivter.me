@@ -1,8 +1,8 @@
-import { BlockDefinition, BlockNode, BlockType, findDefinition, findNode, NodeDefintion } from '../libs/lib';
-import { generateToken } from '../utils/token';
-import { cursorPosition, isCursorOnRect } from '../window/cursor';
-import { getBoardFromEditorPosition } from './board';
-import { editorWindow } from './main';
+import { BlockDefinition, BlockNode, BlockType, findDefinition, findNode, NodeDefintion } from '../../libs/lib';
+import { generateToken } from '../../utils/token';
+import { cursorPosition, isCursorOnRect } from '../../window/cursor';
+import { getBoardFromEditorPosition } from '../board/main';
+import { editorWindow } from '../main';
 
 export interface NodeConnection {
     block: Block;
@@ -50,9 +50,9 @@ function createNodeDOM(node: NodeDefintion, type: 'input' | 'output'): HTMLDivEl
 }
 
 // Creating block DOM element
-function createBlockDOM(block: Block): HTMLDivElement {
+function createBlockDOM(block: Block): HTMLDivElement | undefined {
     let definition: BlockDefinition | undefined = findDefinition(block.type);
-    if(!definition) return;
+    if(!editorWindow || !definition) return;
 
     let htmlElement: HTMLDivElement = <HTMLDivElement> document.createElement('div');
 
@@ -99,11 +99,11 @@ function createBlockDOM(block: Block): HTMLDivElement {
 }
 
 // Get block DOM element
-export function getBlockDOM(block: Block | string): HTMLDivElement {
-    let blockElement: Block = getBlock(block);
+export function getBlockDOM(block: Block | string): HTMLDivElement | undefined {
+    let blockElement: Block | undefined = getBlock(block);
     if(!blockElement) return;
 
-    let htmlElement: HTMLDivElement = <HTMLDivElement> document.getElementById(`block-${blockElement.token}`);
+    let htmlElement: HTMLDivElement | undefined = <HTMLDivElement> document.getElementById(`block-${blockElement.token}`);
     if(!htmlElement) htmlElement = createBlockDOM(blockElement);
 
     return htmlElement;
@@ -111,7 +111,7 @@ export function getBlockDOM(block: Block | string): HTMLDivElement {
 
 // Destroying block DOM element
 function destroyBlockDOM(block: Block | string): void {
-    let htmlElement: HTMLDivElement = getBlockDOM(block);
+    let htmlElement: HTMLDivElement | undefined = getBlockDOM(block);
     if(!htmlElement) return;
 
     htmlElement.remove();
@@ -119,10 +119,10 @@ function destroyBlockDOM(block: Block | string): void {
 
 // Updating single block DOM
 export function updateBlockDOM(block: Block | string): void {
-    let htmlElement: HTMLDivElement = getBlockDOM(block);
-    let blockElement: Block = getBlock(block);
+    let htmlElement: HTMLDivElement | undefined = getBlockDOM(block);
+    let blockElement: Block | undefined = getBlock(block);
 
-    if(!htmlElement) return;
+    if(!htmlElement || !blockElement) return;
 
     htmlElement.style.setProperty('--position-x', `${blockElement.x}px`);
     htmlElement.style.setProperty('--position-y', `${blockElement.y}px`);
@@ -158,16 +158,18 @@ export function createBlock(type: BlockType, x?: number, y?: number): Block {
 }
 
 // Get block by Block or token
-export function getBlock(block: Block | string): Block {
+export function getBlock(block: Block | string): Block | undefined {
     if(typeof block != 'string') {
         return block;
     } else {
-        return blocks.find((value) => value.token == block);
+        return blocks.find((value: Block) => value.token == block);
     }
 }
 
 // Destroying blocks
 export function destroyBlock(block: Block | string): boolean {
+    if(!block) return false;
+
     destroyBlockDOM(block);
 
     if(typeof block == 'string') {
@@ -183,15 +185,3 @@ export function destroyBlock(block: Block | string): boolean {
 
     return false;
 }
-
-// Get cursor under mouse
-export function getBlockUnderMouse(): Block | null {
-    for(let block of blocks) {
-        let rect: DOMRect = getBlockDOM(block).getBoundingClientRect();
-        if(isCursorOnRect(rect)) {
-            return block;
-        }
-    }
-
-    return null;
-};
