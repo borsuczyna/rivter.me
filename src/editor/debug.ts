@@ -3,12 +3,14 @@ import { editorCanvas, editorDimensions } from './main';
 
 interface Debug {
     lastFrame: Date,
-    frameTime: number[]
+    frameTime: number[],
+    fps: number[]
 };
 
 const debugData: Debug = {
     lastFrame: new Date(),
-    frameTime: []
+    frameTime: [],
+    fps: []
 };
 
 function drawDebugGraph(x: number, y: number, width: number, height: number, graph: number[], amount: number = 10, minimalMax: number | null = null) {
@@ -55,13 +57,17 @@ addEventHandler('editorUpdate', () => {
 
     let frameTime: number = new Date().getTime() - debugData.lastFrame.getTime();
     debugData.frameTime.push(frameTime);
+    debugData.fps.push(Math.floor(1000/frameTime));
 
     editorCanvas.font = '10px \'Open Sans\', sans-serif';
     editorCanvas.fillStyle = '#FFffffCC';
     editorCanvas.textBaseline = 'middle';
-    editorCanvas.fillText('frame time', 15, 15);
 
-    drawDebugGraph(15, 25, 250, 130, debugData.frameTime, 100, 50);
+    editorCanvas.fillText('frame time', 20, 15);
+    drawDebugGraph(20, 25, 250, 130, debugData.frameTime, 100, 50);
+    
+    editorCanvas.fillText('fps', 20, 175);
+    drawDebugGraph(20, 185, 250, 130, debugData.fps, 100, 80);
 
     debugData.lastFrame = new Date();
 }, 999);
