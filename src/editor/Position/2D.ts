@@ -27,6 +27,10 @@ export class Position2D {
         return Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
     }
 
+    get inverted() {
+        return new Position2D(-this.x, -this.y);
+    }
+
     set(x?: number, y?: number) {
         if (x !== undefined) {
             this.x = x;

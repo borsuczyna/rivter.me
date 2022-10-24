@@ -2,7 +2,7 @@ import { Editor, EditorExtension } from "../main";
 import { isMobile } from "../Mobile/check";
 import { getTouchesCount, getTouchPosition, isTouchOverRect, TouchPositions } from "../Mobile/position";
 import { Position2D } from "../Position/2D";
-import { isCursorOverRect } from "../Utils/cursor";
+import { cursorPosition, isCursorOverRect } from "../Utils/cursor";
 
 interface MobileZoom {
     holding: boolean;
@@ -14,6 +14,7 @@ export class Zooming extends EditorExtension {
         super();
     }
 
+    zoomToCursor: boolean = true;
     mobileSupport: boolean = true;
     mobile: MobileZoom = {
         holding: false,
@@ -24,8 +25,8 @@ export class Zooming extends EditorExtension {
     max: number | undefined;
 
     private handleScroll(event: WheelEvent) {
-        const overAny = this.editors.some((editor: Editor) => {
-            if(!editor.DOM.blockDiv) return;
+        const overAny = this.editors.some((editor: Editor): boolean => {
+            if(!editor.DOM.blockDiv) return false;
             let rect: DOMRect = editor.DOM.blockDiv.getBoundingClientRect();
             return isCursorOverRect(rect);
         });
@@ -33,8 +34,17 @@ export class Zooming extends EditorExtension {
         this.editors.forEach((editor: Editor) => {
             if(!overAny) return;
 
+            // zooming to cursor
+            if(this.zoomToCursor) {
+                let attitude: -1|1 = event.deltaY >= 0 ? 1 : -1;
+                let editorPosition: Position2D = editor.getEditorFromScreenPosition(cursorPosition);
+                let difference: Position2D = Position2D.difference(editorPosition, editor.position.inverted);
+                editor.position.add(difference.x/10*attitude, difference.y/10*attitude);
+            }
+
             editor.zoom -= event.deltaY/1000;
             editor.zoom = Math.max(Math.min(editor.zoom, this.max || 5), this.min || 0.1);
+
             editor.updatePosition();
         });
     }
@@ -45,6 +55,7 @@ export class Zooming extends EditorExtension {
         addEventListener('wheel', this.handleScroll.bind(this));
     };
 
+    // Mobile zooming
     update = function(editor: Editor) {
         if(!isMobile() || !editor.DOM.blockDiv || !this.mobileSupport) return;
         let rect: DOMRect = editor.DOM.blockDiv.getBoundingClientRect();
@@ -56,10 +67,7 @@ export class Zooming extends EditorExtension {
         } else if(getTouchesCount() == 2 && this.mobile.holding) {
             let difference = this.mobile.distance - distance;
             
-            // console.log(difference)
             this.mobile.distance = distance;
-
-            console.log(this.editors)
 
             this.editors.forEach((editor: Editor) => {
                 editor.zoom -= difference/100;

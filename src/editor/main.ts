@@ -117,4 +117,32 @@ export class Editor {
 
         return this;
     }
+
+    // background-position-x: calc(var(--board-width)/2 + calc(var(--board-x) * var(--board-zoom)));
+
+    getScreenFromEditorPosition(position: Position2D): Position2D {
+        let outPosition: Position2D = new Position2D();
+        let rect: DOMRect = this.DOM.div?.getBoundingClientRect();
+        if(!rect) throw new Error('Attempt too get screen from editior position before initializing DOM element');
+
+        outPosition.set(
+            (rect.x + rect.width/2) + (this.position.x * this.zoom) + (position.x * this.zoom),
+            (rect.y + rect.height/2) + (this.position.y * this.zoom) + (position.y * this.zoom)
+        )
+
+        return outPosition;
+    }
+
+    getEditorFromScreenPosition(position: Position2D): Position2D {
+        let outPosition: Position2D = new Position2D();
+        let rect: DOMRect = this.DOM.div?.getBoundingClientRect();
+        if(!rect) throw new Error('Attempt too get editior from screen position before initializing DOM element');
+
+        outPosition.set(
+            (position.x - (rect.x + rect.width/2))/this.zoom - this.position.x,
+            (position.y - (rect.y + rect.height/2))/this.zoom - this.position.y
+        )
+
+        return outPosition;
+    }
 }

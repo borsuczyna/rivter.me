@@ -1,4 +1,4 @@
-import { Editor, Background, Color, Grabbing, Zooming } from "../src/final";
+import { Editor, Background, Color, Grabbing, Zooming, Position2D, cursorPosition } from "../src/final";
 
 const editorDOM: HTMLDivElement = <HTMLDivElement> document.getElementById('editor');
 const editor: Editor = new Editor();
@@ -22,8 +22,9 @@ const background2: Background = new Background();
 const grabbing2: Grabbing = new Grabbing();
 const zooming2: Zooming = new Zooming();
 
-grabbing2.mobileSupport = false;
-zooming2.mobileSupport = !false;
+// zooming.zoomToCursor = false;
+// grabbing2.mobileSupport = false;
+// zooming2.mobileSupport = false;
 
 editor2
 .setDOMElement(editorDOM2)
