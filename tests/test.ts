@@ -11,5 +11,15 @@ editor
 .use(grabbing)
 .use(background);
 
-background.color.background = new Color(255, 0, 0);
-background.color.background = Color.fromHSL(0, 0, 25);
+const editorDOM2: HTMLDivElement = <HTMLDivElement> document.getElementById('editor2');
+const editor2: Editor = new Editor();
+const background2: Background = new Background();
+
+editor2
+.setDOMElement(editorDOM2)
+.use(grabbing)
+.use(background2);
+
+background2.color.background = new Color(11, 83, 147);
+background2.color.grid = new Color(45, 93, 155);
+background2.gridSize = 10;

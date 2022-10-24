@@ -6,6 +6,6 @@ export class Grabbing extends EditorExtension {
     }
 
     initialize = function(editor: Editor) {
-        
+        if(!editor.DOM.blockDiv) throw new Error('Attempt to init grabbing before initializing DOM element');
     };
 }
