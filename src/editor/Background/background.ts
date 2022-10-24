@@ -11,13 +11,14 @@ style.innerHTML = `
 .__editor__background {
     --background: rgb(20, 20, 20);
     --grid: black;
-    --grid-size: 1px;
+    --grid-size: 50px;
+    --grid-width: 1px;
     --board-zoom: 1;
 
-    background: linear-gradient(to bottom, var(--grid) var(--grid-size), transparent var(--grid-size)), linear-gradient(to right, var(--grid) var(--grid-size), transparent var(--grid-size));
+    background: linear-gradient(to bottom, var(--grid) var(--grid-width), transparent var(--grid-width)), linear-gradient(to right, var(--grid) var(--grid-width), transparent var(--grid-width));
     background-color: var(--background);
 
-    background-size: calc(50px * var(--board-zoom)) calc(50px * var(--board-zoom));
+    background-size: calc(var(--grid-size) * var(--board-zoom)) calc(var(--grid-size) * var(--board-zoom));
 
     background-position-x: calc(var(--board-width)/2 + calc(var(--board-x) * var(--board-zoom)));
     background-position-y: calc(var(--board-height)/2 + calc(var(--board-y) * var(--board-zoom)));
@@ -30,7 +31,8 @@ export class Background extends EditorExtension {
         background: new Color(25, 25, 25),
         grid: new Color(20, 20, 20)
     };
-    private __gridSize: number = 1;
+    private __gridSize: number = 50;
+    private __gridWidth: number = 1;
 
     constructor() {
         super();
@@ -44,6 +46,7 @@ export class Background extends EditorExtension {
             editor.DOM.div.style.setProperty('--background', this.__color.background.rgb);
             editor.DOM.div.style.setProperty('--grid', this.__color.grid.rgb);
             editor.DOM.div.style.setProperty('--grid-size', `${this.__gridSize}px`);
+            editor.DOM.div.style.setProperty('--grid-width', `${this.__gridWidth}px`);
         }
 
         this.editors.forEach(setEditorBackground);
@@ -84,5 +87,14 @@ export class Background extends EditorExtension {
 
     get gridSize(): number {
         return this.__gridSize;
+    }
+
+    set gridWidth(width: number) {
+        this.__gridWidth = width;
+        this.updateStyle();
+    }
+
+    get gridWidth(): number {
+        return this.__gridWidth;
     }
 }

@@ -21,5 +21,6 @@ editor2
 .use(background2);
 
 background2.color.background = new Color(11, 83, 147);
-background2.color.grid = new Color(45, 93, 155);
-background2.gridSize = 10;
+background2.color.grid = new Color(44, 44, 155);
+background2.gridSize = 30;
+background2.gridWidth = 4;
