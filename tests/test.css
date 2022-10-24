@@ -1,0 +1,12 @@
+body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.editor-window {
+    background-color: rgb(24, 24, 24);
+    border-radius: 0.5em;
+    height: 450px;
+    width: 800px;
+}

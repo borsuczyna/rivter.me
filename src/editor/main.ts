@@ -1,88 +1,88 @@
-import './zoom';
-
-import { triggerEvent } from "../utils/events";
-
-export interface EditorPosition {
-    x: number;
-    y: number;
+export interface EditorDOM {
+    div: HTMLDivElement;
+    blockDiv: HTMLDivElement | undefined;
+    canvas: HTMLCanvasElement | undefined;
+    context: CanvasRenderingContext2D;
 };
 
-export interface EditorDimensions {
-    width: number,
-    height: number
-};
+export class EditorExtension {
+    editors: Editor[] = [];
+    initialize: (editor: Editor) => void;
 
-export var editorCanvas: CanvasRenderingContext2D | null = null;
-export var editorWindow: HTMLElement | null = null;
-export var editorCursor: HTMLElement | null = null;
-export var editorRoot: HTMLElement | null = null;
-
-export var editorDimensions: EditorDimensions = {
-    width: 1280,
-    height: 720
-};
-
-export var editorPosition: EditorPosition = {
-    x: 0,
-    y: 0
-};
-
-export var editorZoom: number = 1;
-
-export function updateEditorPosition(): void {
-    if(!editorRoot) return;
-
-    editorRoot.style.setProperty('--board-x', `${editorPosition.x}px`);
-    editorRoot.style.setProperty('--board-y', `${editorPosition.y}px`);
+    use(editor: Editor) {
+        this.editors.push(editor);
+    }
 }
 
-export function setEditorZoom(zoom: number): void {
-    if(!editorRoot) return;
+export class Editor {
+    DOM: EditorDOM;
+    extensions: EditorExtension[] = [];
 
-    editorZoom = zoom;
-    editorRoot.style.setProperty('--board-zoom', `${editorZoom}`);
+    constructor() { /* where is the guru? */ }
+
+    private setStyleProperty(key, value) {
+        this.DOM.canvas?.style.setProperty(key, value);
+        this.DOM.blockDiv?.style.setProperty(key, value);
+    }
+
+    updateDimensions() {
+        if(!this.DOM.div || !this.DOM.canvas) throw new Error('Editor DOM element not found');
+
+        let rect: DOMRect = this.DOM.div.getBoundingClientRect();
+
+        this.setStyleProperty('position', 'absolute');
+        this.setStyleProperty('left', `${rect.left}px`);
+        this.setStyleProperty('top', `${rect.top}px`);
+        this.setStyleProperty('width', `${rect.width}px`);
+        this.setStyleProperty('height', `${rect.height}px`);
+        this.setStyleProperty('overflow', 'hidden');
+        this.setStyleProperty('border-radius', getComputedStyle(this.DOM.div).borderRadius);
+        this.DOM.canvas.style.setProperty('-webkit-mask-image', 'url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC)');
+    }
+
+    private initCanvas() {
+        if(this.DOM.canvas && this.DOM.canvas.parentElement !== this.DOM.div) {
+            this.DOM.canvas.remove();
+            this.DOM.canvas = undefined;
+        }
+
+        if(!this.DOM.canvas) {
+            this.DOM.canvas = document.createElement('canvas');
+            this.DOM.div.append(this.DOM.canvas);
+        }
+
+        this.updateDimensions();
+    }
+
+    private initBlockDiv() {
+        if(this.DOM.blockDiv && this.DOM.blockDiv.parentElement !== this.DOM.div) {
+            this.DOM.blockDiv.remove();
+            this.DOM.blockDiv = undefined;
+        }
+
+        if(!this.DOM.blockDiv) {
+            this.DOM.blockDiv = document.createElement('div');
+            this.DOM.div.append(this.DOM.blockDiv);
+        }
+    }
+
+    use(extension: EditorExtension) {
+        this.extensions.push(extension);
+        
+        extension.use(this);
+
+        if(extension.initialize) extension.initialize(this);
+
+        return this;
+    }
+
+    setDOMElement(element: HTMLDivElement) {
+        this.DOM = <EditorDOM> (this.DOM || {});
+
+        this.DOM.div = element;
+        this.initBlockDiv();
+        this.initCanvas();
+
+        return this;
+    }
 }
-
-export function isRectOnScreen(rect: DOMRect) {
-    return (
-        rect.x + rect.width >= 0 &&
-        rect.y + rect.height >= 0 &&
-        rect.x <= editorDimensions.width &&
-        rect.y <= editorDimensions.height
-    );
-}
-
-function updateEditorDimensions(): void {
-    if(!editorCanvas) return;
-
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-
-    editorDimensions.width = width;
-    editorDimensions.height = height;
-
-    editorCanvas.canvas.width = width;
-    editorCanvas.canvas.height = height;
-}
-
-function initEditor(): void {
-    if(editorCanvas && editorWindow && editorCursor && editorRoot) return;
-
-    let window: HTMLCanvasElement = <HTMLCanvasElement> document.getElementById('editor-canvas');;
-    editorCanvas = window?.getContext('2d');
-    editorWindow = document.getElementById('editor-window');
-    editorCursor = document.getElementById('editor-canvas');
-    editorRoot = document.querySelector(':root');
-
-    updateEditorDimensions();
-    addEventListener('resize', updateEditorDimensions);
-}
-
-initEditor();
-
-function updateEditorEvent() {
-    requestAnimationFrame(updateEditorEvent);
-    triggerEvent('editorUpdate');
-}
-
-requestAnimationFrame(updateEditorEvent);
