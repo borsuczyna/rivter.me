@@ -20,11 +20,15 @@ const editorDOM2: HTMLDivElement = <HTMLDivElement> document.getElementById('edi
 const editor2: Editor = new Editor();
 const background2: Background = new Background();
 const grabbing2: Grabbing = new Grabbing();
+const zooming2: Zooming = new Zooming();
+
+grabbing2.mobileSupport = false;
+zooming2.mobileSupport = !false;
 
 editor2
 .setDOMElement(editorDOM2)
 .use(grabbing2)
-.use(zooming)
+.use(zooming2)
 .use(background2);
 
 background2.color.background = new Color(11, 83, 147);
