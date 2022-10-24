@@ -1,4 +1,4 @@
-class Color {
+export class Color {
     r: number = 255;
     g: number = 255;
     b: number = 255;
@@ -175,5 +175,3 @@ class Color {
         }
     }
 }
-
-export default Color;

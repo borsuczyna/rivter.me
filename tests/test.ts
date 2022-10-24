@@ -1,7 +1,4 @@
-import { Background } from "../src/Editor/Background/background";
-import Color from "../src/Editor/Color/color";
-import { Grabbing } from "../src/Editor/Grabbing/grabbing";
-import { Editor } from "../src/Editor/main";
+import { Editor, Background, Color, Grabbing } from "../src/final";
 
 const editorDOM: HTMLDivElement = <HTMLDivElement> document.getElementById('editor');
 const editor: Editor = new Editor();
