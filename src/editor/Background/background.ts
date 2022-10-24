@@ -1,7 +1,12 @@
 import { Color } from "../Color/color";
 import { Editor, EditorExtension } from "../main";
 
-export interface BackgroundColors {
+interface BackgroundColors {
+    background: Color;
+    grid: Color;
+};
+
+interface ColorSetter {
     background: Color;
     grid: Color;
 };
@@ -64,7 +69,7 @@ export class Background extends EditorExtension {
         this.__color = colors;
     }
     
-    get color(): any {
+    get color(): ColorSetter {
         let __this = this;
 
         return {

@@ -1,3 +1,5 @@
+import { Position2D } from "./Position/2D";
+
 export interface EditorDOM {
     div: HTMLDivElement;
     blockDiv: HTMLDivElement | undefined;
@@ -8,6 +10,8 @@ export interface EditorDOM {
 export class EditorExtension {
     editors: Editor[] = [];
     initialize: (editor: Editor) => void;
+    update: (editor: Editor) => void;
+    priority: number = 0;
 
     use(editor: Editor) {
         this.editors.push(editor);
@@ -17,6 +21,9 @@ export class EditorExtension {
 export class Editor {
     DOM: EditorDOM;
     extensions: EditorExtension[] = [];
+
+    position: Position2D = new Position2D(0, 0);
+    zoom: number = 1;
 
     constructor() { /* where is the guru? */ }
 
@@ -38,6 +45,18 @@ export class Editor {
         this.setStyleProperty('overflow', 'hidden');
         this.setStyleProperty('border-radius', getComputedStyle(this.DOM.div).borderRadius);
         this.DOM.canvas.style.setProperty('-webkit-mask-image', 'url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC)');
+        
+        // variables
+        this.DOM.div.style.setProperty('--board-width', `${rect.width}px`);
+        this.DOM.div.style.setProperty('--board-height', `${rect.height}px`);
+    }
+
+    updatePosition() {
+        if(!this.DOM.div || !this.DOM.canvas) throw new Error('Editor DOM element not found');
+
+        this.DOM.div.style.setProperty('--board-x', `${this.position.x}px`);
+        this.DOM.div.style.setProperty('--board-y', `${this.position.y}px`);
+        this.DOM.div.style.setProperty('--board-zoom', `${this.zoom}`);
     }
 
     private initCanvas() {
@@ -76,12 +95,25 @@ export class Editor {
         return this;
     }
 
+    update() {
+        // this.updateDimensions();
+
+        this.extensions.sort((a: EditorExtension, b: EditorExtension): number => {
+            return a.priority - b.priority
+        }).forEach((extension: EditorExtension) => {
+            if(extension.update) extension.update(this);
+        });
+    }
+
     setDOMElement(element: HTMLDivElement) {
         this.DOM = <EditorDOM> (this.DOM || {});
 
         this.DOM.div = element;
         this.initBlockDiv();
         this.initCanvas();
+        this.updatePosition();
+
+        addEventListener('resize', this.updateDimensions.bind(this));
 
         return this;
     }
