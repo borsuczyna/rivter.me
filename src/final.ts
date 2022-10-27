@@ -8,3 +8,6 @@ export * from './Editor/Utils/keyboard';
 export * from './Editor/Position/2D';
 export * from './Editor/Position/3D';
 export * from './Editor/Mobile/check';
+export * from './Editor/Block/main';
+export * from './Editor/Block/style';
+export * from './Editor/Libraries/lib';

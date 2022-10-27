@@ -6,11 +6,6 @@ interface BackgroundColors {
     grid: Color;
 };
 
-interface ColorSetter {
-    background: Color;
-    grid: Color;
-};
-
 const style = document.createElement('style');
 style.innerHTML = `
 .__editor__background {
@@ -20,7 +15,7 @@ style.innerHTML = `
     --grid-width: 1px;
     --board-zoom: 1;
 
-    background: linear-gradient(to bottom, var(--grid) var(--grid-width), transparent var(--grid-width)), linear-gradient(to right, var(--grid) var(--grid-width), transparent var(--grid-width));
+    background: linear-gradient(to bottom, var(--grid) max(calc(var(--grid-width) * var(--board-zoom)), 1px), transparent max(calc(var(--grid-width) * var(--board-zoom)), 1px)), linear-gradient(to right, var(--grid) max(calc(var(--grid-width) * var(--board-zoom)), 1px), transparent max(calc(var(--grid-width) * var(--board-zoom)), 1px));
     background-color: var(--background);
 
     background-size: calc(var(--grid-size) * var(--board-zoom)) calc(var(--grid-size) * var(--board-zoom));
@@ -69,7 +64,7 @@ export class Background extends EditorExtension {
         this.__color = colors;
     }
     
-    get color(): ColorSetter {
+    get color(): BackgroundColors {
         let __this = this;
 
         return {

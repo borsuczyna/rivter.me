@@ -1,4 +1,7 @@
+import { BlockDefinition, BlockDefinitions, BlockNode, BlockNodes, BlockType } from "./Libraries/lib";
+import { Block } from "./Block/main";
 import { Position2D } from "./Position/2D";
+import { defaultStyle, BlockStyle } from './Block/style';
 
 export interface EditorDOM {
     div: HTMLDivElement;
@@ -19,13 +22,33 @@ export class EditorExtension {
 }
 
 export class Editor {
+    // DOM and extensions controling them
     DOM: EditorDOM;
     extensions: EditorExtension[] = [];
 
+    // Zoom and position
     position: Position2D = new Position2D(0, 0);
     zoom: number = 1;
 
-    constructor() { /* where is the guru? */ }
+    // Blocks
+    blocks: Block[] = [];
+
+    // Definitions, libraries
+    definitions: BlockDefinitions = {};
+    nodes: BlockNodes = {};
+
+    constructor(element: HTMLDivElement) {
+        this.DOM = <EditorDOM> (this.DOM || {});
+
+        this.DOM.div = element;
+        this.initBlockDiv();
+        this.initCanvas();
+        this.updatePosition();
+
+        addEventListener('resize', this.updateDimensions.bind(this));
+
+        this.loadStyle(defaultStyle);
+    }
 
     private setStyleProperty(key, value) {
         this.DOM.canvas?.style.setProperty(key, value);
@@ -105,21 +128,6 @@ export class Editor {
         });
     }
 
-    setDOMElement(element: HTMLDivElement) {
-        this.DOM = <EditorDOM> (this.DOM || {});
-
-        this.DOM.div = element;
-        this.initBlockDiv();
-        this.initCanvas();
-        this.updatePosition();
-
-        addEventListener('resize', this.updateDimensions.bind(this));
-
-        return this;
-    }
-
-    // background-position-x: calc(var(--board-width)/2 + calc(var(--board-x) * var(--board-zoom)));
-
     getScreenFromEditorPosition(position: Position2D): Position2D {
         let outPosition: Position2D = new Position2D();
         let rect: DOMRect = this.DOM.div?.getBoundingClientRect();
@@ -144,5 +152,42 @@ export class Editor {
         )
 
         return outPosition;
+    }
+
+    addBlock(block: Block) {
+        this.blocks.push(block);
+        
+        this.DOM.blockDiv?.appendChild(block.DOM);
+
+        // Call event
+        block.onAdded(this);
+        block.reRender();
+
+        return this;
+    }
+
+    loadLibrary(definitions: BlockDefinitions, nodes: BlockNodes) {
+        this.definitions = {...this.definitions, ...definitions};
+        this.nodes = {...this.nodes, ...nodes};
+
+        return this;
+    }
+
+    findDefinition(type: string): BlockDefinition {
+        return this.definitions[type];
+    }
+
+    loadStyle(style: BlockStyle) {
+        for(let key in style) {
+            let value = style[key];
+            
+            if(key == '@import') {
+                this.setStyleProperty('@import', `{ ${value.concat(';')} }`);
+            } else {
+                this.setStyleProperty(`--${key}`, value);
+            }
+        }
+
+        return this;
     }
 }
