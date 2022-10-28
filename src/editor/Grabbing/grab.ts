@@ -72,10 +72,18 @@ export class Grabbing extends EditorExtension {
             return editor.getBlockUnderCursor();
         });
 
-        console.log(blockUnderCursor);
-
+        let blockGrabbing = this.editors.some((editor: Editor) => {
+            return editor.findExtensionByPartialName('Block grabbing');
+        });
+        
         if(isMobile() && this.mobileSupport) {
-            if(getTouchesCount() == 1 && isTouchOverRect(rect, 0) && !grabbing && !this.grab.holding) {
+            if(
+                getTouchesCount() == 1 &&
+                isTouchOverRect(rect, 0) &&
+                !grabbing &&
+                !this.grab.holding &&
+                !(blockGrabbing && blockUnderCursor)
+            ) {
                 this.grab.holding = true;
                 this.grab.position = getTouchPosition(0).clone();
                 grabbing = true;
@@ -84,25 +92,25 @@ export class Grabbing extends EditorExtension {
                 grabbing = false;
             } else if(grabbing && this.grab.holding && getTouchesCount() == 1) {
                 let difference: Position2D = Position2D.difference(getTouchPosition(0), this.grab.position);
-
+                
                 this.editors.forEach((editor: Editor) => {
                     editor.position.add(difference.x / editor.zoom, difference.y / editor.zoom);
                     editor.updatePosition();
                 });
-
+                
                 this.grab.position = getTouchPosition(0).clone();
             }
         } else if(!isMobile()) {
-            if(!this.grab.active && isCursorOverRect(rect) && isKeyDown(' ') && !grabbing) {
+            if(!this.grab.active && isCursorOverRect(rect) && isKeyDown(' ') && !grabbing && !(blockGrabbing && blockUnderCursor)) {
                 this.grab.active = true;
             } else if(
                 (this.grab.active && !isKeyDown(' ')) ||
                 (this.grab.holding && !isMouseButtonDown(0))
-                ) {
-                    this.grab.active = false;
-                    this.grab.holding = false;
+            ) {
+                this.grab.active = false;
+                this.grab.holding = false;
                 grabbing = false;
-            } else if(this.grab.active && !this.grab.holding && isMouseButtonDown(0) && isCursorOverRect(rect) && !grabbing) {
+            } else if(this.grab.active && !this.grab.holding && isMouseButtonDown(0) && isCursorOverRect(rect) && !grabbing && !(blockGrabbing && blockUnderCursor)) {
                 this.grab.holding = true;
                 this.grab.position = cursorPosition.clone();
                 grabbing = true;

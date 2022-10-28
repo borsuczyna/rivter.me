@@ -200,10 +200,20 @@ export class Block {
     }
 
     getOverPart(): string | boolean {
-        let position: Position2D = (isMobile() && getTouchesCount() == 1) ? getTouchPosition(0) : cursorPosition;
-        let header: HTMLDivElement | null = document.querySelector(`#block-${this.token}`);
+        let overRect: (rect: DOMRect, tocuh: number) => boolean = (isMobile() && getTouchesCount() == 1) ? isTouchOverRect : isCursorOverRect;
+        let header: DOMRect | null | undefined = document.querySelector(`#block-${this.token} .__block__header`)?.getBoundingClientRect();
+        let body: DOMRect | null | undefined = document.querySelector(`#block-${this.token}`)?.getBoundingClientRect();
 
-        console.log(header)
+        if(
+            !header ||
+            !body
+        ) return false;
+
+        if(overRect(header, 0)) {
+            return 'header';
+        } else if(overRect(body, 0)) {
+            return 'body';
+        }
 
         return false;
     }

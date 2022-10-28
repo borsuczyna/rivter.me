@@ -1,4 +1,4 @@
-import { Editor, Background, Grabbing, Zooming, Block, Color } from "../src/final";
+import { Editor, Background, Grabbing, Zooming, Block, Color, BlockGrabbing } from "../src/final";
 import styleWhite from "./style-white";
 
 const editorDOM: HTMLDivElement = <HTMLDivElement> document.getElementById('editor');
@@ -6,6 +6,8 @@ const editorDOM: HTMLDivElement = <HTMLDivElement> document.getElementById('edit
 const grabbing: Grabbing = new Grabbing();
 const background: Background = new Background();
 const zooming: Zooming = new Zooming();
+const blockGrabbing: BlockGrabbing = new BlockGrabbing();
+// blockGrabbing.mobileSupport = false;
 
 // grabbing.limits.minX = 0;
 // grabbing.limits.maxX = 200;
@@ -13,7 +15,7 @@ const zooming: Zooming = new Zooming();
 // grabbing.limits.maxY = 200;
 
 const block = new Block('@mta-server: player-joined');
-block.position.set(250, 250);
+// block.position.set(250, 250);
 block.updatePosition();
 
 zooming.min = 0.3;
@@ -28,6 +30,7 @@ const editor = new Editor(editorDOM)
 .use(grabbing)
 .use(zooming)
 .use(background)
+.use(blockGrabbing)
 .loadLibrary(MTAServer.definitions, MTAServer.nodes)
 .addBlock(block)
 // .loadStyle(styleWhite)

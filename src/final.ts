@@ -2,6 +2,7 @@ export * from './Editor/main';
 export * from './Editor/Background/background';
 export * from './Editor/Grabbing/grab';
 export * from './Editor/Grabbing/zoom';
+export * from './Editor/Grabbing/blocks';
 export * from './Editor/Color/color';
 export * from './Editor/Utils/cursor';
 export * from './Editor/Utils/keyboard';

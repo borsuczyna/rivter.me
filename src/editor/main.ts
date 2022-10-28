@@ -213,4 +213,24 @@ export class Editor {
 
         return null;
     }
+
+    findExtensionByName(name: string): EditorExtension | null {
+        for(let extension of this.extensions) {
+            if(extension.name == name) {
+                return extension;
+            }
+        };
+
+        return null;
+    }
+
+    findExtensionByPartialName(name: string): EditorExtension | null {
+        for(let extension of this.extensions) {
+            if(extension.name.search(name) !== -1) {
+                return extension;
+            }
+        };
+
+        return null;
+    }
 }
