@@ -12,3 +12,4 @@ export * from './Editor/Mobile/check';
 export * from './Editor/Block/main';
 export * from './Editor/Block/style';
 export * from './Editor/Libraries/lib';
+export * from './Editor/Cursor/cursor';

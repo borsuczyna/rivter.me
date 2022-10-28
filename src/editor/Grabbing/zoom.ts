@@ -39,7 +39,7 @@ export class Zooming extends EditorExtension {
             editor.zoom -= event.deltaY/1000;
             editor.zoom = Math.max(Math.min(editor.zoom, this.max || 5), this.min || 0.1);
             let changed: number = original - editor.zoom;
-
+            
             // zooming to cursor
             if(this.zoomToCursor) {
                 let attitude: number = changed*8;
