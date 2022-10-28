@@ -13,6 +13,10 @@ export const definitions: BlockDefinitions = {
                 name: 'Callable test',
                 hoverTip: 'Player that joined server',
                 type: 'player',
+                inputText: {
+                    placeholder: 'message',
+                    default: 'Hello, world!'
+                }
             }
         ],
         outputs: [
@@ -20,13 +24,23 @@ export const definitions: BlockDefinitions = {
                 name: 'Player',
                 hoverTip: 'Player that joined server',
                 type: 'player',
-            }
+            },
+            {
+                name: 'Player',
+                hoverTip: 'Player that joined server',
+                type: 'player',
+            },
+            {
+                name: 'Player',
+                hoverTip: 'Player that joined server',
+                type: 'player',
+            },
         ],
         
         isEvent: true,
 
         generateCode: {
-            header: () => 'addEventHandler(\"onClientResourceStart\", resourceRoot, function()',
+            header: () => 'addEventHandler("onPlayerJoin", resourceRoot, function()',
             footer: () => 'end)'
         }
     }
@@ -35,6 +49,6 @@ export const definitions: BlockDefinitions = {
 export const nodes: BlockNodes = {
     'player': {
         color: new Color(255, 50, 50),
-        validConnections: ['player']
+        validConnections: ['player'],
     }
 };

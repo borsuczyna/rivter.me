@@ -27,6 +27,7 @@ style.innerHTML = `
 document.getElementsByTagName('head')[0].appendChild(style);
 
 export class Background extends EditorExtension {
+    name: string = '@borsuk - Background';
     private __color: BackgroundColors = {
         background: new Color(25, 25, 25),
         grid: new Color(20, 20, 20)

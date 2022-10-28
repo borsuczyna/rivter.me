@@ -10,6 +10,7 @@ interface MobileZoom {
 };
 
 export class Zooming extends EditorExtension {
+    name: string = '@borsuk - Zooming';
     constructor() {
         super();
     }
@@ -34,16 +35,18 @@ export class Zooming extends EditorExtension {
         this.editors.forEach((editor: Editor) => {
             if(!overAny) return;
 
+            let original: number = editor.zoom;
+            editor.zoom -= event.deltaY/1000;
+            editor.zoom = Math.max(Math.min(editor.zoom, this.max || 5), this.min || 0.1);
+            let changed: number = original - editor.zoom;
+
             // zooming to cursor
             if(this.zoomToCursor) {
-                let attitude: -1|1 = event.deltaY >= 0 ? 1 : -1;
+                let attitude: number = changed*8;
                 let editorPosition: Position2D = editor.getEditorFromScreenPosition(cursorPosition);
                 let difference: Position2D = Position2D.difference(editorPosition, editor.position.inverted);
                 editor.position.add(difference.x/10*attitude, difference.y/10*attitude);
             }
-
-            editor.zoom -= event.deltaY/1000;
-            editor.zoom = Math.max(Math.min(editor.zoom, this.max || 5), this.min || 0.1);
 
             editor.updatePosition();
         });

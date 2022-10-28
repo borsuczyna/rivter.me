@@ -1,4 +1,4 @@
-import { BlockDefinition, BlockDefinitions, BlockNode, BlockNodes, BlockType } from "./Libraries/lib";
+import { BlockDefinition, BlockDefinitions, BlockNodes, BlockNode } from "./Libraries/lib";
 import { Block } from "./Block/main";
 import { Position2D } from "./Position/2D";
 import { defaultStyle, BlockStyle } from './Block/style';
@@ -11,6 +11,7 @@ export interface EditorDOM {
 };
 
 export class EditorExtension {
+    name: string;
     editors: Editor[] = [];
     initialize: (editor: Editor) => void;
     update: (editor: Editor) => void;
@@ -166,15 +167,27 @@ export class Editor {
         return this;
     }
 
+    private reloadBlocks() {
+        this.blocks.forEach((block: Block) => {
+            block.reRender();
+        });
+    }
+
     loadLibrary(definitions: BlockDefinitions, nodes: BlockNodes) {
         this.definitions = {...this.definitions, ...definitions};
         this.nodes = {...this.nodes, ...nodes};
+
+        this.reloadBlocks();
 
         return this;
     }
 
     findDefinition(type: string): BlockDefinition {
         return this.definitions[type];
+    }
+
+    findNode(type: string): BlockNode {
+        return this.nodes[type];
     }
 
     loadStyle(style: BlockStyle) {
@@ -189,5 +202,15 @@ export class Editor {
         }
 
         return this;
+    }
+
+    getBlockUnderCursor(): Block | null {
+        for(let block of this.blocks) {
+            if(block.isCursorOver()) {
+                return block;
+            }
+        }
+
+        return null;
     }
 }

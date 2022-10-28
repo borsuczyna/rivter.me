@@ -7,12 +7,17 @@ const grabbing: Grabbing = new Grabbing();
 const background: Background = new Background();
 const zooming: Zooming = new Zooming();
 
+// grabbing.limits.minX = 0;
+// grabbing.limits.maxX = 200;
+// grabbing.limits.minY = 0;
+// grabbing.limits.maxY = 200;
+
 const block = new Block('@mta-server: player-joined');
 block.position.set(250, 250);
 block.updatePosition();
 
 zooming.min = 0.3;
-zooming.max = 4;
+zooming.max = 3;
 
 background.gridWidth = 1;
 // background.color.grid = new Color(255, 255, 255, 255);
@@ -26,7 +31,7 @@ const editor = new Editor(editorDOM)
 .loadLibrary(MTAServer.definitions, MTAServer.nodes)
 .addBlock(block)
 // .loadStyle(styleWhite)
-.addBlock(new Block('Test'));
+// .addBlock(new Block('Test'));
 
 // const editorDOM2: HTMLDivElement = <HTMLDivElement> document.getElementById('editor2');
 // const editor2: Editor = new Editor();

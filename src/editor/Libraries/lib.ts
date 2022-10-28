@@ -8,6 +8,11 @@ export interface NodeDefintion {
     type: string;                           /* Input/output type */
     force?: boolean;                        /* Is it always needed to generate code | ONLY INPUT */
     default?: any;                          /* Default value | ONLY INPUT */
+
+    inputText?: {
+        placeholder: string;
+        default: string;
+    };
 };
 
 export interface BlockDefinition {
@@ -31,6 +36,7 @@ export interface BlockDefinition {
 export interface BlockNode {
     color: Color;
     validConnections: string[] | 'anything';
+    input?: boolean;
 };
 
 export interface BlockDefinitions {

@@ -1,6 +1,9 @@
 import { BlockDefinition, BlockNode, BlockNodes, NodeDefintion } from "../Libraries/lib";
 import { Editor } from "../main";
+import { isMobile } from "../Mobile/check";
+import { getTouchesCount, getTouchPosition, isTouchOverRect } from "../Mobile/position";
 import { Position2D } from "../Position/2D";
+import { cursorPosition, isCursorOverRect } from "../Utils/cursor";
 import { Token } from "../Utils/token";
 
 const style: HTMLStyleElement = document.createElement('style');
@@ -23,7 +26,7 @@ style.innerHTML = `
     border: var(--block-border);
     
     width: max-content;
-    overflow: hidden;
+    // overflow: hidden;
 
     transform: translate(-50%, -50%) scale(var(--board-zoom));
 
@@ -48,6 +51,8 @@ style.innerHTML = `
 }
 
 .__block__node {
+    --node-color: red;
+
     display: flex;
     justify-content: center;
     align-items: center;
@@ -61,8 +66,39 @@ style.innerHTML = `
 .__block__ball {
     width: 12px;
     height: 12px;
-    background-color: red;
+    background-color: var(--node-color);
     border-radius: 50%;
+}
+
+.__block__input .__block__ball::after {
+    transform: translateX(-38px);
+}
+
+.__block__output .__block__ball::after {
+    transform: translateX(38px);
+}
+
+.__block__ball::after {
+    content: "";
+    display: block;
+    width: 12px;
+    height: 12px;
+    background-color: var(--node-color);
+    border-radius: 50%;
+}
+
+.__block__inputText {
+    color: var(--block-input-color);
+    background-color: var(--block-input-background);
+    border-radius: var(--block-input-border-radius);
+    outline: none;
+    border: none;
+    height: 19px;
+    padding: 2px 4px;
+}
+
+.__block__header {
+    margin-bottom: 5px;
 }
 
 .__block__element {
@@ -112,11 +148,16 @@ export class Block {
 
     private renderNode(node: NodeDefintion, type: string): HTMLCode {
         let ball: HTMLCode = `<div class="__block__ball __block__ball__${type}"></div>`;
+        let blockNode: BlockNode = this.editor.findNode(node.type);
 
         return (
-            `<div class="__block__node __block__${type}">
+            `<div class="__block__node __block__${type}" style="--node-color: ${blockNode.color.rgba}">
                 ${type == 'input' && ball || ''}
-                ${node.name}
+                ${(type == 'input' && node.inputText) ? `
+                
+                <input placeholder="${node.inputText.placeholder}" class="__block__inputText" value="${node.inputText.default}">
+
+                ` : node.name}
                 ${type == 'output' && ball || ''}
             </div>`
         )
@@ -150,5 +191,20 @@ export class Block {
                 </div>
             </div>`
         )
+    }
+
+    isCursorOver(): boolean {
+        let rect: DOMRect = this.DOM.getBoundingClientRect();
+
+        return (!isMobile() ? isCursorOverRect(rect) : (getTouchesCount() == 1 && isTouchOverRect(rect, 0)));
+    }
+
+    getOverPart(): string | boolean {
+        let position: Position2D = (isMobile() && getTouchesCount() == 1) ? getTouchPosition(0) : cursorPosition;
+        let header: HTMLDivElement | null = document.querySelector(`#block-${this.token}`);
+
+        console.log(header)
+
+        return false;
     }
 }
