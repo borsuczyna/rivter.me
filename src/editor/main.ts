@@ -7,7 +7,7 @@ export interface EditorDOM {
     div: HTMLDivElement;
     blockDiv: HTMLDivElement | undefined;
     canvas: HTMLCanvasElement | undefined;
-    context: CanvasRenderingContext2D;
+    context: CanvasRenderingContext2D | undefined;
 };
 
 export class EditorExtension {
@@ -73,6 +73,8 @@ export class Editor {
         // variables
         this.DOM.div.style.setProperty('--board-width', `${rect.width}px`);
         this.DOM.div.style.setProperty('--board-height', `${rect.height}px`);
+
+        this.updateCanvasDimensions();
     }
 
     updatePosition() {
@@ -83,15 +85,27 @@ export class Editor {
         this.DOM.div.style.setProperty('--board-zoom', `${this.zoom}`);
     }
 
+    private updateCanvasDimensions() {
+        if(!this.DOM.canvas) return;
+
+        let rect: DOMRect = this.DOM.div.getBoundingClientRect();
+        this.DOM.canvas.width = rect.width;
+        this.DOM.canvas.height = rect.height;
+    }
+
     private initCanvas() {
         if(this.DOM.canvas && this.DOM.canvas.parentElement !== this.DOM.div) {
             this.DOM.canvas.remove();
             this.DOM.canvas = undefined;
+            this.DOM.context = undefined;
         }
 
         if(!this.DOM.canvas) {
             this.DOM.canvas = document.createElement('canvas');
+            this.DOM.context = <CanvasRenderingContext2D> this.DOM.canvas.getContext('2d');
             this.DOM.div.append(this.DOM.canvas);
+
+            this.updateCanvasDimensions();
         }
 
         this.updateDimensions();

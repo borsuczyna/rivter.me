@@ -1,4 +1,4 @@
-import { Editor, Background, Grabbing, Zooming, Block, Color, BlockGrabbing, Cursor, Position2D } from "../src/final";
+import { Editor, Background, Grabbing, Zooming, Block, Color, BlockGrabbing, Cursor, Position2D, Debug } from "../src/final";
 import styleWhite from "./style-white";
 
 const editorDOM: HTMLDivElement = <HTMLDivElement> document.getElementById('editor');
@@ -8,6 +8,7 @@ const background: Background = new Background();
 const zooming: Zooming = new Zooming();
 const blockGrabbing: BlockGrabbing = new BlockGrabbing();
 const cursor: Cursor = new Cursor();
+const debug: Debug = new Debug();
 // blockGrabbing.mobileSupport = false;
 
 // grabbing.limits.minX = 0;
@@ -33,6 +34,7 @@ const editor = new Editor(editorDOM)
 .use(background)
 .use(blockGrabbing)
 .use(cursor)
+.use(debug)
 .loadLibrary(MTAServer.definitions, MTAServer.nodes)
 .addBlock(block)
 // .loadStyle(styleWhite)
