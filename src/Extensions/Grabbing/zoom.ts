@@ -1,8 +1,8 @@
-import { Editor, EditorExtension } from "../main";
-import { isMobile } from "../Mobile/check";
-import { getTouchesCount, getTouchPosition, isTouchOverRect, TouchPositions } from "../Mobile/position";
-import { Position2D } from "../Position/2D";
-import { cursorPosition, isCursorOverRect } from "../Utils/cursor";
+import { Editor, EditorExtension } from "../../Editor/main";
+import { isMobile } from "../../Editor/Mobile/check";
+import { getTouchesCount, getTouchPosition, isTouchOverRect, TouchPositions } from "../../Editor/Mobile/position";
+import { Position2D } from "../../Editor/Position/2D";
+import { cursorPosition, isCursorOverRect } from "../../Editor/Utils/cursor";
 
 interface MobileZoom {
     holding: boolean;

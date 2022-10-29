@@ -1,8 +1,4 @@
 export * from './Editor/main';
-export * from './Editor/Background/background';
-export * from './Editor/Grabbing/grab';
-export * from './Editor/Grabbing/zoom';
-export * from './Editor/Grabbing/blocks';
 export * from './Editor/Color/color';
 export * from './Editor/Utils/cursor';
 export * from './Editor/Utils/keyboard';
@@ -12,4 +8,9 @@ export * from './Editor/Mobile/check';
 export * from './Editor/Block/main';
 export * from './Editor/Block/style';
 export * from './Editor/Libraries/lib';
-export * from './Editor/Cursor/cursor';
+
+export * from './Extensions/Background/background';
+export * from './Extensions/Grabbing/grab';
+export * from './Extensions/Grabbing/zoom';
+export * from './Extensions/Grabbing/blocks';
+export * from './Extensions/Cursor/cursor';

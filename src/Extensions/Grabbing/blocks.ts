@@ -1,10 +1,10 @@
-import { Block } from "../Block/main";
+import { Block } from "../../Editor/Block/main";
 import { Cursor } from "../Cursor/cursor";
-import { Editor, EditorExtension } from "../main";
-import { isMobile } from "../Mobile/check";
-import { getTouchPosition } from "../Mobile/position";
-import { Position2D } from "../Position/2D";
-import { cursorPosition, isMouseButtonDown } from "../Utils/cursor";
+import { Editor, EditorExtension } from "../../Editor/main";
+import { isMobile } from "../../Editor/Mobile/check";
+import { getTouchPosition } from "../../Editor/Mobile/position";
+import { Position2D } from "../../Editor/Position/2D";
+import { cursorPosition, isMouseButtonDown } from "../../Editor/Utils/cursor";
 import { Grabbing } from "./grab";
 
 export class BlockGrabbing extends EditorExtension {
@@ -12,6 +12,8 @@ export class BlockGrabbing extends EditorExtension {
     mobileSupport: boolean = true;
     holding: Block | null;
     holdingPosition: Position2D = new Position2D();
+    rotateWhileMoving: boolean = true;
+    changeOpacity: boolean = true;
 
     constructor() {
         super();
@@ -19,12 +21,31 @@ export class BlockGrabbing extends EditorExtension {
 
     update = (editor: Editor) => {
         if(this.holding) {
-            if(isMouseButtonDown(0) || (isMobile() && this.mobileSupport && getTouchPosition(0).x != 0 && getTouchPosition(0).y != 0)) {
+            if(
+                isMouseButtonDown(0) ||
+                (isMobile() && this.mobileSupport && getTouchPosition(0).x != 0 && getTouchPosition(0).y != 0)
+            ) {
                 (<Cursor>editor.findExtensionByPartialName('Cursor'))?.setCursor('grabbing');
-                let editorPosition: Position2D = editor.getEditorFromScreenPosition((isMobile() && this.mobileSupport) ? getTouchPosition(0) : cursorPosition);
+                let editorPosition: Position2D = editor.getEditorFromScreenPosition(
+                    (isMobile() && this.mobileSupport) ? getTouchPosition(0) : cursorPosition
+                );
+                let prePosition: Position2D = this.holding.position.clone();
+
                 this.holding.position = Position2D.sum(editorPosition, this.holdingPosition);
+
+                if(this.rotateWhileMoving) {
+                    let difference: Position2D = Position2D.difference(prePosition, this.holding.position);
+                    this.holding.DOM.style.setProperty('--rotation', `${-difference.x/20}deg`);
+                }
+                
+                if(this.changeOpacity) {
+                    this.holding.DOM.style.setProperty('opacity', '0.5');
+                }
+
                 this.holding.updatePosition();
             } else {
+                this.holding.DOM.style.setProperty('--rotation', `0deg`);
+                this.holding.DOM.style.setProperty('opacity', '1');
                 this.holding = null;
             }
 

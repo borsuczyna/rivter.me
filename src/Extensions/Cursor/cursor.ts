@@ -1,4 +1,4 @@
-import { Editor, EditorExtension } from "../main";
+import { Editor, EditorExtension } from "../../Editor/main";
 
 export class Cursor extends EditorExtension {
     name: string = '@borsuk - Cursor';

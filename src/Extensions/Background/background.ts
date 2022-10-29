@@ -1,5 +1,5 @@
-import { Color } from "../Color/color";
-import { Editor, EditorExtension } from "../main";
+import { Color } from "../../Editor/Color/color";
+import { Editor, EditorExtension } from "../../Editor/main";
 
 interface BackgroundColors {
     background: Color;

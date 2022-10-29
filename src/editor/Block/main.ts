@@ -13,6 +13,7 @@ style.innerHTML = `
 .__block__element {
     --position-x: 0px;
     --position-y: 0px;
+    --rotation: 0deg;
 
     text-align: var(--block-text-align);
     position: absolute;
@@ -28,7 +29,7 @@ style.innerHTML = `
     width: max-content;
     // overflow: hidden;
 
-    transform: translate(-50%, -50%) scale(var(--board-zoom));
+    transform: translate(-50%, -50%) scale(var(--board-zoom)) rotate(var(--rotation));
 
     left: calc(var(--board-width)/2 + calc(var(--board-x) * var(--board-zoom)) + var(--position-x) * var(--board-zoom));
     top: calc(var(--board-height)/2 + calc(var(--board-y) * var(--board-zoom)) + var(--position-y) * var(--board-zoom));

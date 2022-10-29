@@ -1,4 +1,4 @@
-import { Editor, Background, Grabbing, Zooming, Block, Color, BlockGrabbing, Cursor } from "../src/final";
+import { Editor, Background, Grabbing, Zooming, Block, Color, BlockGrabbing, Cursor, Position2D } from "../src/final";
 import styleWhite from "./style-white";
 
 const editorDOM: HTMLDivElement = <HTMLDivElement> document.getElementById('editor');
@@ -37,6 +37,17 @@ const editor = new Editor(editorDOM)
 .addBlock(block)
 // .loadStyle(styleWhite)
 // .addBlock(new Block('Test'));
+
+addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+
+    let position: Position2D = editor.getEditorFromScreenPosition(new Position2D(e.clientX, e.clientY));
+    let block = new Block('@mta-server: player-joined');
+    block.position = position;
+    block.updatePosition();
+
+    editor.addBlock(block);
+})
 
 // const editorDOM2: HTMLDivElement = <HTMLDivElement> document.getElementById('editor2');
 // const editor2: Editor = new Editor();
