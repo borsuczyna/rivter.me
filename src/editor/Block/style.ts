@@ -24,6 +24,9 @@ export var defaultStyle: BlockStyle = {
     'block-checkbox-inside': 'rgb(135,135,135)',
     'block-checkbox-radius': '4px',
     'block-checkbox-inside-radius': '50%',
+
+    'motion-color': 'rgb(155, 255, 50)',
+    'motion-bottom-line': 'rgb(55,55,55)'
 };
 
 export interface BlockStyle {

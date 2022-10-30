@@ -1,4 +1,4 @@
-import { Editor, Background, Grabbing, Zooming, Block, Color, BlockGrabbing, Cursor, Position2D, Debug } from "../src/final";
+import { Editor, Background, Grabbing, Zooming, Block, Color, BlockGrabbing, Cursor, Position2D, Debug, isMobile } from "../src/final";
 import styleWhite from "./style-white";
 
 const editorDOM: HTMLDivElement = <HTMLDivElement> document.getElementById('editor');
@@ -15,6 +15,12 @@ const debug: Debug = new Debug();
 // grabbing.limits.maxX = 200;
 // grabbing.limits.minY = 0;
 // grabbing.limits.maxY = 200;
+
+addEventListener('click', () => {
+    if(!isMobile()) return;
+
+    document.body.requestFullscreen();
+})
 
 const block = new Block('@mta-server: player-joined');
 const block2 = new Block('@mta-server: send-message');

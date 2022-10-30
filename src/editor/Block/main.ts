@@ -150,6 +150,66 @@ style.innerHTML = `
     top: 2px;
 }
 
+.__block__motions {
+    display: flex;
+    flex-direction: row;
+    padding-bottom: 5px;
+    margin-bottom: 3px;
+    border-bottom: 1px solid var(--motion-bottom-line);
+}
+
+.__block__motion {
+    flex-grow: 1;
+}
+
+.__motion__start {
+    text-align: left;
+}
+
+.__motion__next {
+    text-align: right;
+}
+
+.__motion__icon {
+    border: solid var(--motion-color);
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(-45deg);
+    width: 2px;
+    height: 2px;
+}
+
+.__motion__icon::after {
+    content: "";
+    display: block;
+    position: absolute;
+    border: solid var(--motion-color);
+    border-width: 0 3px 3px 0;
+    display: block;
+    padding: 3px;
+    width: 2px;
+    height: 2px;
+}
+
+.__motion__start .__motion__icon::after {
+    transform: rotate(45deg) translateX(-44px) rotate(-45deg);
+}
+
+.__motion__next .__motion__icon::after {
+    transform: rotate(45deg) translateX(34px) rotate(-45deg);
+}
+
+.__motion__start .__motion__icon {
+    margin-left: 4px;
+    margin-right: 6px;
+}
+
+.__motion__next .__motion__icon {
+    margin-left: 2px;
+    margin-right: 9px;
+}
+
 .__block__element {
     -webkit-touch-callout: none; /* iOS Safari */
       -webkit-user-select: none; /* Safari */
@@ -225,10 +285,16 @@ export class Block {
         let definition: BlockDefinition = this.editor?.findDefinition(this.type);
         let inputs: HTMLCode = this.renderNodes(definition?.inputs, 'input');
         let outputs: HTMLCode = this.renderNodes(definition?.outputs, 'output');
+        let motionStart: HTMLCode = '<div class="__block__motion __motion__start"><div class="__motion__icon"></div> Motion</div>';
+        let motionNext: HTMLCode = '<div class="__block__motion __motion__next">Motion <div class="__motion__icon"></div></div>';
 
         return (
             `<div class="__block__header">
                 ${definition?.name || `${this.type}`}
+            </div>
+            <div class="__block__motions">
+                ${definition?.motionStart ? motionStart : ''}
+                ${definition?.motionNext ? motionNext : ''}
             </div>
             <div class="__block__content">
                 <div class="__block__inputs">

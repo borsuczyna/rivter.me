@@ -220,6 +220,13 @@ export class Editor {
     }
 
     getBlockUnderCursor(): Block | null {
+        this.blocks.sort((a: Block, b: Block) => {
+            let aIndex: number | string = a.DOM.style.getPropertyValue('z-index');
+            let bIndex: number | string = b.DOM.style.getPropertyValue('z-index');
+
+            return parseInt(bIndex) - parseInt(aIndex);
+        });
+
         for(let block of this.blocks) {
             if(block.isCursorOver()) {
                 return block;
