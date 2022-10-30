@@ -15,7 +15,15 @@ export var defaultStyle: BlockStyle = {
 
     'block-input-color': 'white',
     'block-input-background': 'rgb(55, 55, 55)',
-    'block-input-border-radius': '5px'
+    'block-input-border-radius': '5px',
+
+    'block-checkbox-background': 'rgb(45,45,45)',
+    'block-checkbox-border': 'rgb(55,55,55)',
+    'block-checkbox-background-checked': 'rgb(50,50,50)',
+    'block-checkbox-border-checked': 'rgb(65,65,65)',
+    'block-checkbox-inside': 'rgb(135,135,135)',
+    'block-checkbox-radius': '4px',
+    'block-checkbox-inside-radius': '50%',
 };
 
 export interface BlockStyle {

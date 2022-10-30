@@ -121,6 +121,35 @@ style.innerHTML = `
     margin-bottom: 5px;
 }
 
+.__block__checkbox {
+    margin: 0;
+    border: 1px solid var(--block-checkbox-border);
+    width: 12px;
+    height: 12px;
+    outline: none;
+    background-color: var(--block-checkbox-background);
+    border-radius: var(--block-checkbox-radius);
+    -webkit-appearance: none;
+    apperance: none;
+}
+
+.__block__checkbox:checked {
+    background-color: var(--block-checkbox-background-checked);
+    border: 1px solid var(--block-checkbox-border-checked);
+}
+
+.__block__checkbox:checked::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    display: block;
+    background: var(--block-checkbox-inside);
+    border-radius: var(--block-checkbox-inside-radius);
+    position: relative;
+    left: 2px;
+    top: 2px;
+}
+
 .__block__element {
     -webkit-touch-callout: none; /* iOS Safari */
       -webkit-user-select: none; /* Safari */
@@ -174,7 +203,7 @@ export class Block {
 
         return (
             `<div class="__block__node __block__${type}" style="--node-color: ${blockNode.color.rgba}">
-                ${type == 'input' && node.type == 'check' ? '<input type="checkbox"/>' : ''}
+                ${type == 'input' && node.type == 'check' ? '<input type="checkbox" checked class="__block__checkbox"/>' : ''}
                 ${(type == 'input' && node.type != 'check') && ball || ''}
                 ${(type == 'input' && node.inputText) ? `<input placeholder="${node.inputText.placeholder}" class="__block__inputText" value="${node.inputText.default}">` :node.name}
                 ${type == 'output' && ball || ''}
