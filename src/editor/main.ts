@@ -104,6 +104,7 @@ export class Editor {
             this.DOM.canvas = document.createElement('canvas');
             this.DOM.context = <CanvasRenderingContext2D> this.DOM.canvas.getContext('2d');
             this.DOM.div.append(this.DOM.canvas);
+            this.DOM.canvas.style.setProperty('z-index', '2147483647');
 
             this.updateCanvasDimensions();
         }
@@ -175,15 +176,15 @@ export class Editor {
         this.DOM.blockDiv?.appendChild(block.DOM);
 
         // Call event
-        block.onAdded(this);
-        block.reRender();
+        block.__onAdded(this);
+        block.__reRender();
 
         return this;
     }
 
     private reloadBlocks() {
         this.blocks.forEach((block: Block) => {
-            block.reRender();
+            block.__reRender();
         });
     }
 

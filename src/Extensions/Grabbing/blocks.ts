@@ -7,6 +7,8 @@ import { Position2D } from "../../Editor/Position/2D";
 import { cursorPosition, isMouseButtonDown } from "../../Editor/Utils/cursor";
 import { Grabbing } from "./grab";
 
+const buildTime: number = new Date().getTime();
+
 export class BlockGrabbing extends EditorExtension {
     name: string = '@borsuk - Block grabbing';
     mobileSupport: boolean = true;
@@ -41,6 +43,8 @@ export class BlockGrabbing extends EditorExtension {
                 if(this.changeOpacity) {
                     this.holding.DOM.style.setProperty('opacity', '0.5');
                 }
+
+                this.holding.DOM.style.setProperty('z-index', `${Math.floor(new Date().getTime()%buildTime/100)}`);
 
                 this.holding.updatePosition();
             } else {

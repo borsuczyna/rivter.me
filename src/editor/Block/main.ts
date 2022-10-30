@@ -40,12 +40,20 @@ style.innerHTML = `
 }
 
 .__block__inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: start;
     flex-grow: 1;
     width: max-content;
     text-align: left;
 }
 
 .__block__outputs {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: start;
     flex-grow: 1;
     width: max-content;
     text-align: right;
@@ -61,6 +69,7 @@ style.innerHTML = `
     min-width: max-content;
     width: max-content;
     flex-grow: 1;
+    max-height: 23px;
     padding-inline: 5px;
 }
 
@@ -69,6 +78,16 @@ style.innerHTML = `
     height: 12px;
     background-color: var(--node-color);
     border-radius: 50%;
+}
+
+.__block__output {
+    margin-right: 0;
+    margin-left: auto;
+}
+
+.__block__input {
+    margin-right: auto;
+    margin-left: 0;
 }
 
 .__block__input .__block__ball::after {
@@ -134,11 +153,13 @@ export class Block {
         this.updatePosition();
     }
 
-    reRender() { // it's just and event, don't call it on your own
+    __reRender() { // it's just and event, don't call it on your own
         this.DOM.innerHTML = this.render();
     }
 
-    onAdded(editor: Editor) { // it's just and event, don't call it on your own
+    __onAdded(editor: Editor) { // it's just and event, don't call it on your own
+        if(this.editor) throw new Error('Attempt to add block to two editors at once');
+
         this.editor = editor;
     }
 
@@ -153,12 +174,9 @@ export class Block {
 
         return (
             `<div class="__block__node __block__${type}" style="--node-color: ${blockNode.color.rgba}">
-                ${type == 'input' && ball || ''}
-                ${(type == 'input' && node.inputText) ? `
-                
-                <input placeholder="${node.inputText.placeholder}" class="__block__inputText" value="${node.inputText.default}">
-
-                ` : node.name}
+                ${type == 'input' && node.type == 'check' ? '<input type="checkbox"/>' : ''}
+                ${(type == 'input' && node.type != 'check') && ball || ''}
+                ${(type == 'input' && node.inputText) ? `<input placeholder="${node.inputText.placeholder}" class="__block__inputText" value="${node.inputText.default}">` :node.name}
                 ${type == 'output' && ball || ''}
             </div>`
         )

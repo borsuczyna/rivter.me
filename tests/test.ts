@@ -17,8 +17,9 @@ const debug: Debug = new Debug();
 // grabbing.limits.maxY = 200;
 
 const block = new Block('@mta-server: player-joined');
-// block.position.set(250, 250);
-block.updatePosition();
+const block2 = new Block('@mta-server: send-message');
+block2.position.set(350, 0);
+block2.updatePosition();
 
 zooming.min = 0.3;
 zooming.max = 3;
@@ -34,11 +35,12 @@ const editor = new Editor(editorDOM)
 .use(background)
 .use(blockGrabbing)
 .use(cursor)
-.use(debug)
+// .use(debug)
 .loadLibrary(MTAServer.definitions, MTAServer.nodes)
 .addBlock(block)
+.addBlock(block2)
 // .loadStyle(styleWhite)
-// .addBlock(new Block('Test'));
+// .addBlock(new Block('@mta-server: send-message'));
 
 addEventListener('contextmenu', (e) => {
     e.preventDefault();
