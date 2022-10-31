@@ -1,6 +1,6 @@
-import { Color, Style } from "../src/final";
+import { Color, Style } from "../final";
 
-export default {
+export const styleMonokai: Style = {
     style: {
         'block-background': 'rgb(37, 38, 32)',
         'block-text-color': 'white',
@@ -33,4 +33,4 @@ export default {
     },
     backgroundColor: new Color(39, 40, 34, 255).darken(25),
     gridColor: new Color(37, 37, 38, 100).darken(40)
-} as Style;
+};

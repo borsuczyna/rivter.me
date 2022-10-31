@@ -114,6 +114,7 @@ export default `
 
 .__block__header {
     margin-bottom: 5px;
+    padding-inline: var(--block-text-padding);
 }
 
 .__block__checkbox {
@@ -188,7 +189,7 @@ export default `
 }
 
 .__motion__start .__motion__icon::after {
-    transform: rotate(45deg) translateX(-44px) rotate(-45deg);
+    transform: rotate(45deg) translateX(-42px) rotate(-45deg);
 }
 
 .__motion__next .__motion__icon::after {

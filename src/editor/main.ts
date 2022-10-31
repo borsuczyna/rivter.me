@@ -208,7 +208,6 @@ export class Editor {
 
     loadStyle(style: Style) {
         for(let key in style.style) {
-            console.log(key)
             let value = style.style[key];
             
             if(key == '@import') {

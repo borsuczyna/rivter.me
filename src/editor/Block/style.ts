@@ -16,6 +16,7 @@ export var defaultStyle: Style = {
         'block-padding': '8px',
         'block-border': '1px solid rgb(20, 20, 20)',
         'block-ball-radius': '50%',
+        'block-text-padding': '0',
 
         'block-input-color': 'white',
         'block-input-background': 'rgb(55, 55, 55)',

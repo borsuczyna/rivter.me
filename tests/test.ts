@@ -1,7 +1,4 @@
-import { Editor, Background, Grabbing, Zooming, Block, Color, BlockGrabbing, Cursor, Position2D, Debug, isMobile, Nodes } from "../src/final";
-import whiteStyle from "./style-white";
-import monokaiStyle from "./style-monokai";
-import unityStyle from "./style-unity";
+import { Editor, Background, Grabbing, Zooming, Block, Color, BlockGrabbing, Cursor, Position2D, Debug, isMobile, Nodes, styleMonokai } from "../src/final";
 
 const editorDOM: HTMLDivElement = <HTMLDivElement> document.getElementById('editor');
 
@@ -47,8 +44,8 @@ const editor = new Editor(editorDOM)
 .addBlock(block)
 .addBlock(block2)
 // .loadStyle(whiteStyle)
-.loadStyle(monokaiStyle)
-// .loadStyle(unityStyle)
+// .loadStyle(monokaiStyle)
+.loadStyle(styleMonokai)
 // .addBlock(new Block('@mta-server: send-message'));
 
 addEventListener('contextmenu', (e) => {

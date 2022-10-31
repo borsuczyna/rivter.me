@@ -1,6 +1,6 @@
-import { Color, Style } from "../src/final";
+import { Color, Style } from "../final";
 
-export default {
+export const styleWhite: Style = {
     style: {
         'block-background': 'rgb(155, 155, 155)',
         'block-text-color': 'rgb(45, 45, 45)',
@@ -32,4 +32,4 @@ export default {
     },
     backgroundColor: new Color(155, 155, 155, 255).lighten(15),
     gridColor: new Color(100, 100, 100, 100).lighten(15)
-} as Style;
+};
