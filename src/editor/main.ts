@@ -1,7 +1,8 @@
 import { BlockDefinition, BlockDefinitions, BlockNodes, BlockNode } from "./Libraries/lib";
 import { Block } from "./Block/main";
 import { Position2D } from "./Position/2D";
-import { defaultStyle, BlockStyle } from './Block/style';
+import { defaultStyle, BlockStyle, Style } from './Block/style';
+import { Background } from "../final";
 
 export interface EditorDOM {
     div: HTMLDivElement;
@@ -205,15 +206,22 @@ export class Editor {
         return this.nodes[type];
     }
 
-    loadStyle(style: BlockStyle) {
-        for(let key in style) {
-            let value = style[key];
+    loadStyle(style: Style) {
+        for(let key in style.style) {
+            console.log(key)
+            let value = style.style[key];
             
             if(key == '@import') {
                 this.setStyleProperty('@import', `{ ${value.concat(';')} }`);
             } else {
                 this.setStyleProperty(`--${key}`, value);
             }
+        }
+
+        let background: Background | null = (<Background>this.findExtensionByPartialName('Background'));
+        if(background) {
+            (<Background>this.findExtensionByPartialName('Background')).color.background = style.backgroundColor;
+            (<Background>this.findExtensionByPartialName('Background')).color.grid = style.gridColor;
         }
 
         return this;

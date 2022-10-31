@@ -8,7 +8,7 @@ export default {
         'block-font': "'Open Sans', sans-serif",
         'block-min-width': '150px',
         'block-max-width': '1050px',
-        'block-radius': '7px',
+        'block-radius': '2px',
         'block-padding': '8px',
         'block-border': '1px solid rgb(55, 55, 55)',
 
@@ -30,6 +30,6 @@ export default {
         'motion-color': 'rgb(155, 255, 50)',
         'motion-bottom-line': 'rgb(55,55,55)'
     },
-    backgroundColor: new Color(155, 155, 155, 255).lighten(15),
-    gridColor: new Color(100, 100, 100, 100).lighten(15)
+    backgroundColor: new Color(37, 37, 38, 100).darken(40),
+    gridColor: new Color(100, 100, 100, 100).lighten(15),
 } as Style;
