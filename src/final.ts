@@ -15,3 +15,4 @@ export * from './Extensions/Grabbing/zoom';
 export * from './Extensions/Grabbing/blocks';
 export * from './Extensions/Cursor/cursor';
 export * from './Extensions/Debug/debug';
+export * from './Extensions/Nodes/nodes';

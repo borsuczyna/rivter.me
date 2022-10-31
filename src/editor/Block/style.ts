@@ -12,6 +12,7 @@ export var defaultStyle: BlockStyle = {
     'block-radius': '7px',
     'block-padding': '8px',
     'block-border': '1px solid rgb(20, 20, 20)',
+    'block-ball-radius': '50%',
 
     'block-input-color': 'white',
     'block-input-background': 'rgb(55, 55, 55)',
@@ -26,7 +27,7 @@ export var defaultStyle: BlockStyle = {
     'block-checkbox-inside-radius': '50%',
 
     'motion-color': 'rgb(155, 255, 50)',
-    'motion-bottom-line': 'rgb(55,55,55)'
+    'motion-bottom-line': 'rgb(55,55,55)',
 };
 
 export interface BlockStyle {

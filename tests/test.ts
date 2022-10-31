@@ -1,5 +1,6 @@
-import { Editor, Background, Grabbing, Zooming, Block, Color, BlockGrabbing, Cursor, Position2D, Debug, isMobile } from "../src/final";
+import { Editor, Background, Grabbing, Zooming, Block, Color, BlockGrabbing, Cursor, Position2D, Debug, isMobile, Nodes } from "../src/final";
 import styleWhite from "./style-white";
+import styleMonokai from "./style-monokai";
 
 const editorDOM: HTMLDivElement = <HTMLDivElement> document.getElementById('editor');
 
@@ -9,6 +10,7 @@ const zooming: Zooming = new Zooming();
 const blockGrabbing: BlockGrabbing = new BlockGrabbing();
 const cursor: Cursor = new Cursor();
 const debug: Debug = new Debug();
+const nodes: Nodes = new Nodes();
 // blockGrabbing.mobileSupport = false;
 
 // grabbing.limits.minX = 0;
@@ -31,7 +33,10 @@ zooming.min = 0.3;
 zooming.max = 3;
 
 background.gridWidth = 1;
-// background.color.grid = new Color(255, 255, 255, 255);
+background.color.grid = new Color(37, 37, 38, 100).darken(40);
+background.color.background = new Color(39, 40, 34, 255).darken(25);
+// background.color.grid = new Color(100, 100, 100, 100).lighten(15);
+// background.color.background = new Color(155, 155, 155, 255).lighten(15);
 
 import * as MTAServer from './libraries/MTA-Server';
 
@@ -41,11 +46,13 @@ const editor = new Editor(editorDOM)
 .use(background)
 .use(blockGrabbing)
 .use(cursor)
+.use(nodes)
 // .use(debug)
 .loadLibrary(MTAServer.definitions, MTAServer.nodes)
 .addBlock(block)
 .addBlock(block2)
 // .loadStyle(styleWhite)
+.loadStyle(styleMonokai)
 // .addBlock(new Block('@mta-server: send-message'));
 
 addEventListener('contextmenu', (e) => {

@@ -174,4 +174,18 @@ export class Color {
             return new Color(c + m, m, x + m, a);
         }
     }
+
+    darken(amount) : Color {
+        this.r = this.r * (100 - amount) / 100;
+        this.g = this.g * (100 - amount) / 100;
+        this.b = this.b * (100 - amount) / 100;
+        return this;
+    }
+  
+    lighten(amount) : Color {
+        this.r = this.r + (255 - this.r) * amount / 100;
+        this.g = this.g + (255 - this.g) * amount / 100;
+        this.b = this.b + (255 - this.b) * amount / 100;
+        return this;
+    }
 }
