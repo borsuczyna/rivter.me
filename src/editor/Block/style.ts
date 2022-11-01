@@ -15,8 +15,13 @@ export var defaultStyle: Style = {
         'block-radius': '7px',
         'block-padding': '8px',
         'block-border': '1px solid rgb(20, 20, 20)',
-        'block-ball-radius': '50%',
         'block-text-padding': '0',
+
+        'block-ball-radius': '50%',
+        'block-ball-side-radius': '50%',
+        'block-ball-gap': '32px',
+        'block-ball-side-width': '12px',
+        'block-ball-side-height': '12px',
 
         'block-input-color': 'white',
         'block-input-background': 'rgb(55, 55, 55)',
@@ -32,6 +37,8 @@ export var defaultStyle: Style = {
 
         'motion-color': 'rgb(155, 255, 50)',
         'motion-bottom-line': 'rgb(55,55,55)',
+        'motion-left': '-44px',
+        'motion-right': '34px',
     },
     backgroundColor: new Color(25, 25, 25),
     gridColor: new Color(20, 20, 20)

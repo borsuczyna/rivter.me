@@ -85,20 +85,24 @@ export default `
 }
 
 .__block__input .__block__ball::after {
-    transform: translateX(-38px);
+    transform: translateX(
+        calc(0px - var(--block-ball-gap) - var(--block-ball-side-width)/2)
+    );
 }
 
 .__block__output .__block__ball::after {
-    transform: translateX(38px);
+    transform: translateX(
+        calc(var(--block-ball-gap) + 12px - var(--block-ball-side-width)/2)
+    );
 }
 
 .__block__ball::after {
     content: "";
     display: block;
-    width: 12px;
-    height: 12px;
+    width: var(--block-ball-side-width);
+    height: var(--block-ball-side-height);
     background-color: var(--node-color);
-    border-radius: var(--block-ball-radius);
+    border-radius: var(--block-ball-side-radius);
 }
 
 .__block__inputText {
@@ -189,11 +193,11 @@ export default `
 }
 
 .__motion__start .__motion__icon::after {
-    transform: rotate(45deg) translateX(-42px) rotate(-45deg);
+    transform: rotate(45deg) translateX(var(--motion-left)) rotate(-45deg);
 }
 
 .__motion__next .__motion__icon::after {
-    transform: rotate(45deg) translateX(34px) rotate(-45deg);
+    transform: rotate(45deg) translateX(var(--motion-right)) rotate(-45deg);
 }
 
 .__motion__start .__motion__icon {

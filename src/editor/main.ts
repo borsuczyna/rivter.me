@@ -3,6 +3,7 @@ import { Block } from "./Block/main";
 import { Position2D } from "./Position/2D";
 import { defaultStyle, BlockStyle, Style } from './Block/style';
 import { Background } from "../final";
+import { Color } from './Color/color';
 
 export interface EditorDOM {
     div: HTMLDivElement;
@@ -137,6 +138,7 @@ export class Editor {
 
     update() {
         // this.updateDimensions();
+        this.DOM.context?.clearRect(0, 0, this.DOM.canvas?.width || 0, this.DOM.canvas?.height || 0);
 
         this.extensions.sort((a: EditorExtension, b: EditorExtension): number => {
             return a.priority - b.priority
@@ -261,5 +263,24 @@ export class Editor {
         };
 
         return null;
+    }
+
+    getVisibleBlocks(): Block[] {
+        let blocks: Block[] = [];
+
+        for(let block of this.blocks) {
+            if(block.isOnScreen()) {
+                blocks.push(block);
+            }
+        }
+
+        return blocks;
+    }
+
+    drawRectangle(x: number, y: number, w: number, h: number, color: Color) {
+        if(!this.DOM.canvas || !this.DOM.context) return;
+
+        this.DOM.context.fillStyle = color.rgba;
+        this.DOM.context.fillRect(x, y, w, h);
     }
 }

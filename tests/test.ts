@@ -1,4 +1,4 @@
-import { Editor, Background, Grabbing, Zooming, Block, Color, BlockGrabbing, Cursor, Position2D, Debug, isMobile, Nodes, styleMonokai } from "../src/final";
+import { Editor, Background, Grabbing, Zooming, Block, Color, BlockGrabbing, Cursor, Position2D, Debug, isMobile, Nodes, styleMonokai, styleUnity } from "../src/final";
 
 const editorDOM: HTMLDivElement = <HTMLDivElement> document.getElementById('editor');
 
@@ -44,8 +44,8 @@ const editor = new Editor(editorDOM)
 .addBlock(block)
 .addBlock(block2)
 // .loadStyle(whiteStyle)
-// .loadStyle(monokaiStyle)
-.loadStyle(styleMonokai)
+// .loadStyle(styleUnity)
+// .loadStyle(styleMonokai)
 // .addBlock(new Block('@mta-server: send-message'));
 
 addEventListener('contextmenu', (e) => {
@@ -79,6 +79,8 @@ addEventListener('contextmenu', (e) => {
 // background2.color.grid = new Color(44, 44, 155);
 // background2.gridSize = 30;
 // background2.gridWidth = 1;
+
+// let requestAnimationFrame = (callback) => setTimeout(callback, 0)
 
 function updateEditor() {
     requestAnimationFrame(updateEditor);

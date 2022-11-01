@@ -114,4 +114,22 @@ export class Block {
 
         return false;
     }
+
+    isOnScreen(): boolean {
+        let rect: DOMRect | null = this.DOM.getBoundingClientRect();
+        let editorRect: DOMRect | null = this.editor?.DOM.div?.getBoundingClientRect();
+        if(!rect || !editorRect) return false;
+
+        rect.x -= rect.width*0.2;
+        rect.y -= rect.height*0.2;
+        rect.width *= 1.4;
+        rect.height *= 1.4;
+
+        return (
+            rect.x + rect.width >= editorRect.x &&
+            rect.y + rect.height >= editorRect.y &&
+            rect.x <= editorRect.x + editorRect.width &&
+            rect.y <= editorRect.y + editorRect.height
+        );
+    }
 }

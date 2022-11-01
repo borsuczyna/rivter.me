@@ -13,7 +13,7 @@ export const styleMonokai: Style = {
         'block-border': '1px solid rgb(25, 25, 25)',
 
         'block-ball-border': '1px solid rgb(55,55,55)',
-        'block-ball-radius': '5px',
+        // 'block-ball-radius': '5px',
 
         'block-input-color': 'white',
         'block-input-background': new Color(37, 38, 32).lighten(5).rgb,
@@ -29,7 +29,12 @@ export const styleMonokai: Style = {
         'block-checkbox-inside-radius': '50%',
 
         'motion-color': 'rgb(155, 255, 50)',
-        'motion-bottom-line': 'rgb(25,25,25)'
+        'motion-bottom-line': 'rgb(25,25,25)',
+
+        // 'block-ball-gap': '12px',
+        // 'block-ball-side-radius': '5px',
+        // 'block-ball-side-width': '2px',
+        // 'block-ball-side-height': '12px',
     },
     backgroundColor: new Color(39, 40, 34, 255).darken(25),
     gridColor: new Color(37, 37, 38, 100).darken(40)
