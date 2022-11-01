@@ -15,6 +15,12 @@ export class Position2D {
         return new Position2D(a.x - b.x, a.y - b.y);
     }
 
+    times(mult: number) {
+        this.x *= mult;
+        this.y *= mult;
+        return this;
+    }
+
     static sum(a: Position2D, b: Position2D) {
         return new Position2D(a.x + b.x, a.y + b.y);
     }

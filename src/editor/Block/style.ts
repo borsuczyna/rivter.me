@@ -37,7 +37,7 @@ export var defaultStyle: Style = {
 
         'motion-color': 'rgb(155, 255, 50)',
         'motion-bottom-line': 'rgb(55,55,55)',
-        'motion-left': '-44px',
+        'motion-left': '-42px',
         'motion-right': '34px',
     },
     backgroundColor: new Color(25, 25, 25),

@@ -283,4 +283,51 @@ export class Editor {
         this.DOM.context.fillStyle = color.rgba;
         this.DOM.context.fillRect(x, y, w, h);
     }
+    
+    quadraticCurve = (start: Position2D, end: Position2D, attitude: Position2D, color: Color[] | Color, width: number) => {
+        if(!this.DOM.context) return;
+
+        this.DOM.context.beginPath();
+        this.DOM.context.moveTo(start.x, start.y);
+        this.DOM.context.quadraticCurveTo(attitude.x, attitude.y, end.x, end.y);
+        
+        if(color instanceof Color) {
+            this.DOM.context.strokeStyle = color.rgb;
+        } else {
+            let gradient = this.DOM.context.createLinearGradient(start.x, start.y, end.x, end.y);
+            gradient.addColorStop(0, color[0].rgb);
+            gradient.addColorStop(1, color[1].rgb);
+            this.DOM.context.strokeStyle = gradient;
+        }
+    
+        this.DOM.context.lineWidth = width;
+        this.DOM.context.stroke();
+    };
+
+    easyQuadraticCurve = (startPosition: Position2D, targetPosition: Position2D, color: Color[] | Color, width: number) => {
+        let halfTargetPosition: Position2D = Position2D.sum(startPosition, Position2D.difference(targetPosition, startPosition).times(0.5));
+        let attidutePosition: Position2D = new Position2D(startPosition.x + (targetPosition.x - startPosition.x)/2, startPosition.y + (targetPosition.y - startPosition.y)/2);
+
+        this.quadraticCurve(
+            startPosition,
+            halfTargetPosition,
+            new Position2D(
+                startPosition.x + (halfTargetPosition.x - startPosition.x)/2,
+                startPosition.y
+            ), 
+            color, 
+            width
+        );
+
+        this.quadraticCurve(
+            halfTargetPosition,
+            targetPosition,
+            new Position2D(
+                halfTargetPosition.x + (targetPosition.x - halfTargetPosition.x)/2,
+                targetPosition.y
+            ), 
+            color, 
+            width
+        );
+    }
 }

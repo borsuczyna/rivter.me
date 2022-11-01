@@ -26,6 +26,8 @@ const block = new Block('@mta-server: player-joined');
 const block2 = new Block('@mta-server: send-message');
 block2.position.set(350, 0);
 block2.updatePosition();
+block.createConnection(block2, 'motion-next');
+block.createConnection(block2, 'input', 1, 1);
 
 zooming.min = 0.3;
 zooming.max = 3;

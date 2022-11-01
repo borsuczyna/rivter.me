@@ -11,7 +11,14 @@ const style: HTMLStyleElement = document.createElement('style');
 style.innerHTML = blockCSS;
 document.getElementsByTagName('head')[0].appendChild(style);
 
+export type NodeType = 'motion-start' | 'motion-next' | 'input' | 'output';
 export type HTMLCode = string;
+export interface NodeConnection {
+    block: Block;
+    type: NodeType;
+    startID?: number;
+    targetID?: number;
+};
 
 export class Block {
     position: Position2D = new Position2D(0, 0);
@@ -19,6 +26,7 @@ export class Block {
     type: string;
     DOM: HTMLDivElement;
     editor: Editor;
+    connections: NodeConnection[] = [];
 
     constructor(type) {
         this.type = type;
@@ -131,5 +139,88 @@ export class Block {
             rect.x <= editorRect.x + editorRect.width &&
             rect.y <= editorRect.y + editorRect.height
         );
+    }
+
+    findConnection(type: NodeType, id?: number): NodeConnection | null {
+        if(type == 'motion-next' || type == 'motion-start') {
+            return this.connections.filter((connection: NodeConnection): boolean => {
+                return connection.type == type;
+            })[0];
+        } else {
+            return this.connections.filter((connection: NodeConnection): boolean => {
+                return connection.type == type && connection.startID == id;
+            })[0];
+        }
+    }
+
+    findTargetConnection(block: Block, type: NodeType, id?: number): NodeConnection | null {
+        if(type == 'motion-next' || type == 'motion-start') {
+            return this.connections.filter((connection: NodeConnection): boolean => {
+                return (
+                    connection.block == block &&
+                    (connection.type == 'motion-next' ? 'motion-start' : 'motion-next') == type
+                );
+            })[0];
+        } else {
+            return this.connections.filter((connection: NodeConnection): boolean => {
+                return (
+                    connection.block == block &&
+                    (connection.type == 'input' ? 'output' : 'input') == type &&
+                    connection.targetID == id
+                );
+            })[0];
+        }
+    }
+
+    removeConnection(type: NodeType, id?: number) {
+        if(type == 'motion-start' || type == 'motion-next') {
+            this.connections = this.connections.filter((connection: NodeConnection): boolean => {
+                return !(connection.type == type);
+            });
+        } else {
+            this.connections = this.connections.filter((connection: NodeConnection): boolean => {
+                return !(connection.type == type && connection.startID == id);
+            });
+        }
+    }
+
+    createConnection(block: Block, type: NodeType, startID?: number, targetID?: number) {
+        if(type == 'motion-next' || type == 'motion-start') {
+            let connection: NodeConnection | null = this.findConnection(type);
+            if(connection) {
+                connection.block.removeConnection(type == 'motion-start' ? 'motion-next' : 'motion-start');
+                this.removeConnection(type);
+            }
+
+            this.connections.push({
+                block: block,
+                type: type
+            });
+
+            block.connections.push({
+                block: this,
+                type: type == 'motion-start' ? 'motion-next' : 'motion-start'
+            });
+        } else {
+            let connection: NodeConnection | null = this.findConnection(type);
+            if(connection) {
+                connection.block.removeConnection(type == 'input' ? 'output' : 'input', targetID);
+                this.removeConnection(type, startID);
+            }
+
+            this.connections.push({
+                block: block,
+                type: type == 'input' ? 'output' : 'input',
+                startID: startID,
+                targetID: targetID
+            });
+
+            block.connections.push({
+                block: this,
+                type: type,
+                startID: targetID,
+                targetID: startID
+            });
+        }
     }
 }

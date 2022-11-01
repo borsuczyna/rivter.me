@@ -1,12 +1,10 @@
-import { Block } from "../../Editor/Block/main";
+import { Block, NodeConnection, NodeType } from "../../Editor/Block/main";
 import { Editor, EditorExtension } from "../../Editor/main";
 import { Color } from "../../Editor/Color/color";
 import { Position2D } from "../../Editor/Position/2D";
-import { isMobile } from "../../final";
+import { isMobile } from '../../Editor/Mobile/check';
 import { isTouchOverRect } from "../../Editor/Mobile/position";
-import { isCursorOverRect } from "../../Editor/Utils/cursor";
-
-type NodeType = 'motion-start' | 'motion-next' | 'input' | 'output';
+import { cursorPosition, isCursorOverRect } from "../../Editor/Utils/cursor";
 
 interface NodeUnderCursor {
     block: Block;
@@ -21,6 +19,7 @@ export class Nodes extends EditorExtension {
     detectScale: number = 1.2;
     mobileScale: number = 1.6;
     mobileBiggerScale: boolean = true;
+    lineWidth: number = 2;
 
     constructor() {
         super();
@@ -160,10 +159,67 @@ export class Nodes extends EditorExtension {
         return null;
     }
 
-    update = (editor: Editor) => {
-        let node: NodeUnderCursor | null = this.getNodeUnderCursor(editor);
-        if(!node) return;
+    private drawBlockNodeConnections(block: Block, drawn: NodeConnection[]) {
+        let isDrawn = (node: NodeConnection): boolean => {
+            return (
+                drawn.filter((value: NodeConnection): boolean => {
+                    return (
+                        node.block == value.block &&
+                        node.startID == value.startID &&
+                        node.targetID == value.targetID &&
+                        node.type == value.type
+                    )
+                }).length > 0
+            )
+        };
 
-        editor.drawRectangle(node.position.x, node.position.y, node.position.width, node.position.height, new Color(255, 0, 0, 155));
+        for(let connection of block.connections) {
+            if(isDrawn(connection)) continue;
+
+            if(connection.type == 'motion-start' || connection.type == 'motion-next') {
+                let position: DOMRect | null = this.getNodePosition(block, connection.type, 1);
+                let tPosition: DOMRect | null = this.getNodePosition(connection.block, connection.type == 'motion-start' ? 'motion-next' : 'motion-start');
+                if(position && tPosition) {
+                    let startPosition: Position2D = new Position2D(position.x + position.width/1.5, position.y + position.height/2*0.9);
+                    let targetPosition: Position2D = new Position2D(tPosition.x + tPosition.width/2*1.1, tPosition.y + tPosition.height/2*0.9);
+                    
+                    block.editor.easyQuadraticCurve(startPosition, targetPosition, new Color(155, 255, 50), block.editor.zoom*this.lineWidth);
+
+                    drawn.push({
+                        block: block,
+                        type: connection.type == 'motion-start' ? 'motion-next' : 'motion-start',
+                    });
+                }
+            } else {
+                let position: DOMRect | null = this.getNodePosition(block, connection.type, 1, connection.startID);
+                let tPosition: DOMRect | null = this.getNodePosition(connection.block, connection.type == 'input' ? 'output' : 'input', 1, connection.targetID);
+                if(position && tPosition) {
+                    let startPosition: Position2D = new Position2D(position.x + position.width/2, position.y + position.height/3);
+                    let targetPosition: Position2D = new Position2D(tPosition.x + tPosition.width/2, tPosition.y + tPosition.height/3);
+                    
+                    block.editor.easyQuadraticCurve(startPosition, targetPosition, new Color(255, 50, 50), block.editor.zoom*this.lineWidth);
+
+                    drawn.push({
+                        block: block,
+                        type: connection.type == 'input' ? 'output' : 'input',
+                    });
+                }
+            }
+        }
+    }
+
+    update = (editor: Editor) => {
+        let visible: Block[] = editor.getVisibleBlocks();
+        let drawn: NodeConnection[] = [];
+
+        for(let block of visible) {
+            this.drawBlockNodeConnections(block, drawn);
+        }
+
+        // let node: NodeUnderCursor | null = this.getNodeUnderCursor(editor);
+        // if(!node) return;
+
+        // editor.drawRectangle(node.position.x, node.position.y, node.position.width, node.position.height, new Color(255, 0, 0, 155));
+
     };
 }
