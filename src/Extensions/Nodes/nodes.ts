@@ -3,8 +3,10 @@ import { Editor, EditorExtension } from "../../Editor/main";
 import { Color } from "../../Editor/Color/color";
 import { Position2D } from "../../Editor/Position/2D";
 import { isMobile } from '../../Editor/Mobile/check';
-import { isTouchOverRect } from "../../Editor/Mobile/position";
-import { cursorPosition, isCursorOverRect } from "../../Editor/Utils/cursor";
+import { getTouchPosition, isTouchOverRect } from "../../Editor/Mobile/position";
+import { cursorPosition, isCursorOverRect, isMouseButtonDown } from "../../Editor/Utils/cursor";
+import { BlockGrabbing } from "../Grabbing/blocks";
+import { Cursor } from "../Cursor/cursor";
 
 interface NodeUnderCursor {
     block: Block;
@@ -13,13 +15,21 @@ interface NodeUnderCursor {
     id?: number;
 };
 
+interface HoldingNode {
+    block: Block;
+    element: NodeType;
+    id?: number;
+};
+
 export class Nodes extends EditorExtension {
     name: string = '@borsuk - Nodes';
     useConnecting: boolean = true;
+    mobileSupport: boolean = true;
     detectScale: number = 1.2;
     mobileScale: number = 1.6;
     mobileBiggerScale: boolean = true;
     lineWidth: number = 2;
+    holding: HoldingNode | null = null;
 
     constructor() {
         super();
@@ -42,6 +52,19 @@ export class Nodes extends EditorExtension {
             detectRect.width * scale,
             detectRect.height * scale
         );
+    }
+
+    private invertType(type: NodeType): NodeType {
+        switch(type) {
+            case 'input':
+                return 'output';
+            case 'motion-next':
+                return 'motion-start';
+            case 'motion-start':
+                return 'motion-next';
+            case 'output':
+                return 'input';
+        }
     }
 
     getNodePosition(block: Block, node: NodeType, scale: number = 1, id?: number): DOMRect | null {
@@ -203,59 +226,48 @@ export class Nodes extends EditorExtension {
         for(let connection of block.connections) {
             if(isDrawn(connection)) continue;
 
-            if(connection.type == 'motion-start' || connection.type == 'motion-next') {
-                let position: DOMRect | null = this.getNodePosition(block, connection.type, 1);
-                let tPosition: DOMRect | null = this.getNodePosition(connection.block, connection.type == 'motion-start' ? 'motion-next' : 'motion-start');
-                if(position && tPosition) {
-                    let startPosition: Position2D = new Position2D(position.x + position.width/1.5, position.y + position.height/2*0.9);
-                    let targetPosition: Position2D = new Position2D(tPosition.x + tPosition.width/2*1.1, tPosition.y + tPosition.height/2*0.9);
-                    let editorPosition: DOMRect = block.editor.DOM.div.getBoundingClientRect();
-                    let element: HTMLDivElement | null = this.getNodeDOMElement(block, connection.type);
-                    if(!element) return;
-                    let style: CSSStyleDeclaration = getComputedStyle(element);
+            let isMotion: boolean = (connection.type == 'motion-start' || connection.type == 'motion-next');
+            let position: DOMRect | null = this.getNodePosition(block, connection.type, 1, connection.startID);
+            let tPosition: DOMRect | null = this.getNodePosition(connection.block, this.invertType(connection.type), 1, connection.targetID);
 
-                    block.editor.easyQuadraticCurve(
-                        Position2D.difference(startPosition, new Position2D(editorPosition.x, editorPosition.y)),
-                        Position2D.difference(targetPosition, new Position2D(editorPosition.x, editorPosition.y)),
-                        Color.fromRGB(style.borderColor),
-                        block.editor.zoom*this.lineWidth
-                    );
+            if(position && tPosition) {
+                let startPosition: Position2D = (
+                    isMotion ?
+                    new Position2D(position.x + position.width/1.5, position.y + position.height/2*0.9) :
+                    new Position2D(position.x + position.width/2, position.y + position.height/3)
+                );
 
-                    drawn.push({
-                        block: block,
-                        type: connection.type == 'motion-start' ? 'motion-next' : 'motion-start',
-                    });
-                }
-            } else {
-                let position: DOMRect | null = this.getNodePosition(block, connection.type, 1, connection.startID);
-                let tPosition: DOMRect | null = this.getNodePosition(connection.block, connection.type == 'input' ? 'output' : 'input', 1, connection.targetID);
-                if(position && tPosition) {
-                    let startPosition: Position2D = new Position2D(position.x + position.width/2, position.y + position.height/3);
-                    let targetPosition: Position2D = new Position2D(tPosition.x + tPosition.width/2, tPosition.y + tPosition.height/3);
-                    let editorPosition: DOMRect = block.editor.DOM.div.getBoundingClientRect();
-                    let element: HTMLDivElement | null = this.getNodeDOMElement(block, connection.type, connection.startID);
-                    let element2: HTMLDivElement | null = this.getNodeDOMElement(connection.block, connection.type == 'input' ? 'output' : 'input', connection.targetID);
-                    if(!element || !element2) return;
-                    let style: CSSStyleDeclaration = getComputedStyle(element);
-                    let style2: CSSStyleDeclaration = getComputedStyle(element2);
+                let targetPosition: Position2D = (
+                    isMotion ?
+                    new Position2D(tPosition.x + tPosition.width/2*1.1, tPosition.y + tPosition.height/2*0.9) :
+                    new Position2D(tPosition.x + tPosition.width/2, tPosition.y + tPosition.height/3)
+                );
 
-                    block.editor.easyQuadraticCurve(
-                        Position2D.difference(startPosition, new Position2D(editorPosition.x, editorPosition.y)),
-                        Position2D.difference(targetPosition, new Position2D(editorPosition.x, editorPosition.y)),
-                        [Color.fromRGB(style['background-color']), Color.fromRGB(style2['background-color'])],
-                        block.editor.zoom*this.lineWidth
-                    );
+                let editorPosition: DOMRect = block.editor.DOM.div.getBoundingClientRect();
+                let element: HTMLDivElement | null = this.getNodeDOMElement(block, connection.type, connection.startID);
+                let element2: HTMLDivElement | null = this.getNodeDOMElement(connection.block, this.invertType(connection.type), connection.targetID);
+                if(!element || !element2) return;
+                let style: CSSStyleDeclaration = getComputedStyle(element);
+                let style2: CSSStyleDeclaration = getComputedStyle(element2);
 
-                    drawn.push({
-                        block: block,
-                        type: connection.type == 'input' ? 'output' : 'input',
-                        startID: connection.targetID,
-                        targetID: connection.startID
-                    });
-                }
+                block.editor.easyQuadraticCurve(
+                    Position2D.difference(startPosition, new Position2D(editorPosition.x, editorPosition.y)),
+                    Position2D.difference(targetPosition, new Position2D(editorPosition.x, editorPosition.y)),
+                    isMotion ? Color.fromRGB(style.borderColor) : [Color.fromRGB(style['background-color']), Color.fromRGB(style2['background-color'])],
+                    block.editor.zoom*this.lineWidth
+                );
+
+                drawn.push({
+                    block: block,
+                    type: this.invertType(connection.type),
+                    startID: connection.targetID,
+                    targetID: connection.startID
+                });
             }
         }
     }
+
+    private lastNode: NodeUnderCursor | null;
 
     update = (editor: Editor) => {
         let visible: Block[] = editor.getVisibleBlocks();
@@ -264,11 +276,100 @@ export class Nodes extends EditorExtension {
         for(let block of visible) {
             this.drawBlockNodeConnections(block, drawn);
         }
-
+        
         let node: NodeUnderCursor | null = this.getNodeUnderCursor(editor);
-        if(!node) return;
+        if(node || this.holding) {
+            (<Cursor>editor.findExtensionByPartialName('Cursor'))?.setCursor('cell');
+        }
 
-        editor.drawRectangle(node.position.x, node.position.y, node.position.width, node.position.height, new Color(255, 0, 0, 155));
+        if(
+            node &&
+            this.useConnecting &&
+            !this.holding &&
+            (
+                (!isMobile() && isMouseButtonDown(0)) || (
+                    isMobile() && getTouchPosition(0).x != 0 && getTouchPosition(0).y != 0
+                )
+            ) &&
+            !((<BlockGrabbing>editor.findExtensionByPartialName('Block grabbing'))?.holding)
+        ) {
+            let connection: NodeConnection | null = node.block.findConnection(node.element, node.id);
+            if(connection) {
+                connection.block.removeConnection(this.invertType(node.element), connection.targetID);
+                node.block.removeConnection(node.element, node.id);
+            }
 
+            this.holding = {
+                block: node.block,
+                element: node.element,
+                id: node.id
+            };
+        } else if(this.holding) {
+            if(!(
+                (!isMobile() && isMouseButtonDown(0)) || (
+                    isMobile() && getTouchPosition(0).x != 0 && getTouchPosition(0).y != 0
+                )
+            )) {
+                if(this.lastNode && this.invertType(this.holding.element) == this.lastNode.element) {
+                    let connection: NodeConnection | null = this.lastNode.block.findConnection(this.lastNode.element, this.lastNode.id);
+                    if(connection) {
+                        connection.block.removeConnection(this.invertType(this.lastNode.element), connection.targetID);
+                        this.lastNode.block.removeConnection(this.lastNode.element, this.lastNode.id);
+                    }
+
+                    if(this.lastNode.element.startsWith('motion')) {
+                        this.holding.block.createConnection(this.lastNode.block, this.invertType(this.lastNode.element));
+                    } else {
+                        this.holding.block.createConnection(this.lastNode.block, this.lastNode.element, this.holding.id, this.lastNode.id);
+                    }
+                }
+
+                this.holding = null;
+                return;
+            }
+
+            let position: DOMRect | null = this.getNodePosition(this.holding.block, this.holding.element, 1, this.holding.id);
+            if(position) {
+                let isMotion: boolean = (this.holding.element == 'motion-start' || this.holding.element == 'motion-next');
+                
+                let startPosition: Position2D = (
+                    isMotion ?
+                    new Position2D(position.x + position.width/1.5, position.y + position.height/2*0.9) :
+                    new Position2D(position.x + position.width/2, position.y + position.height/3)
+                );
+
+                let targetPosition: Position2D = !isMobile() ? cursorPosition : getTouchPosition(0);
+                let editorPosition: DOMRect = this.holding.block.editor.DOM.div.getBoundingClientRect();
+                let element: HTMLDivElement | null = this.getNodeDOMElement(this.holding.block, this.holding.element, this.holding.id);
+                let element2: HTMLDivElement | null = null;
+
+                if(node && this.invertType(this.holding.element) == node.element) {
+                    element2 = this.getNodeDOMElement(node.block, node.element, node.id);
+
+                    let tPosition: DOMRect | null = this.getNodePosition(node.block, node.element, 1, node.id);
+                    if(tPosition) targetPosition = (
+                        isMotion ?
+                        new Position2D(tPosition.x + tPosition.width/2*1.1, tPosition.y + tPosition.height/2*0.9) :
+                        new Position2D(tPosition.x + tPosition.width/2, tPosition.y + tPosition.height/3)
+                    );
+                }
+
+                if(!element) return;
+                let style: CSSStyleDeclaration = getComputedStyle(element);
+                let style2: CSSStyleDeclaration | null = null;
+                if(element2) style2 = getComputedStyle(element2);
+
+                this.holding.block.editor.easyQuadraticCurve(
+                    Position2D.difference(startPosition, new Position2D(editorPosition.x, editorPosition.y)),
+                    Position2D.difference(targetPosition, new Position2D(editorPosition.x, editorPosition.y)),
+                    this.holding.element.startsWith('motion') ? Color.fromRGB(style.borderColor) : (
+                        style2 ? [Color.fromRGB(style['background-color']), Color.fromRGB(style2['background-color'])] : Color.fromRGB(style['background-color'])
+                    ),
+                    this.holding.block.editor.zoom*this.lineWidth
+                );
+            }
+        }
+
+        this.lastNode = node;
     };
 }

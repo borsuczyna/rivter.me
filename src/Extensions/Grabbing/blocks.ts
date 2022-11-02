@@ -6,6 +6,7 @@ import { getTouchPosition } from "../../Editor/Mobile/position";
 import { Position2D } from "../../Editor/Position/2D";
 import { cursorPosition, isMouseButtonDown } from "../../Editor/Utils/cursor";
 import { Grabbing } from "./grab";
+import { Nodes } from "../../final";
 
 const buildTime: number = new Date().getTime();
 
@@ -24,8 +25,11 @@ export class BlockGrabbing extends EditorExtension {
     update = (editor: Editor) => {
         if(this.holding) {
             if(
-                isMouseButtonDown(0) ||
-                (isMobile() && this.mobileSupport && getTouchPosition(0).x != 0 && getTouchPosition(0).y != 0)
+                (
+                    isMouseButtonDown(0) ||
+                    (isMobile() && this.mobileSupport && getTouchPosition(0).x != 0 && getTouchPosition(0).y != 0)
+                ) &&
+                !((<Nodes>editor.findExtensionByPartialName('Nodes'))?.holding)
             ) {
                 (<Cursor>editor.findExtensionByPartialName('Cursor'))?.setCursor('grabbing');
                 let editorPosition: Position2D = editor.getEditorFromScreenPosition(
@@ -68,7 +72,7 @@ export class BlockGrabbing extends EditorExtension {
         let hoveredPart: string | boolean = overBlock.getOverPart();
         if(!hoveredPart) return;
 
-        if(hoveredPart == 'header') {
+        if(hoveredPart == 'header' && !((<Nodes>editor.findExtensionByPartialName('Nodes'))?.holding)) {
             (<Cursor>editor.findExtensionByPartialName('Cursor'))?.setCursor('grab');
 
             if(isMouseButtonDown(0) || (isMobile() && this.mobileSupport)) {

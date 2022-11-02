@@ -7,6 +7,7 @@ import { Position2D } from "../../Editor/Position/2D";
 import { cursorPosition, isCursorOverRect, isMouseButtonDown } from "../../Editor/Utils/cursor";
 import { isKeyDown } from "../../Editor/Utils/keyboard";
 import { BlockGrabbing } from "./blocks";
+import { Nodes } from "../../final";
 
 interface GrabData {
     position: Position2D;
@@ -85,7 +86,8 @@ export class Grabbing extends EditorExtension {
                 isTouchOverRect(rect, 0) &&
                 !grabbing &&
                 !this.grab.holding &&
-                !(blockGrabbing && blockUnderCursor)
+                !(blockGrabbing && blockUnderCursor) &&
+                !((<Nodes>editor.findExtensionByPartialName('Nodes'))?.holding)
             ) {
                 this.grab.holding = true;
                 this.grab.position = getTouchPosition(0).clone();
@@ -93,7 +95,7 @@ export class Grabbing extends EditorExtension {
             } else if(grabbing && this.grab.holding && getTouchesCount() !== 1) {
                 this.grab.holding = false;
                 grabbing = false;
-            } else if(grabbing && this.grab.holding && getTouchesCount() == 1) {
+            } else if(grabbing && this.grab.holding && getTouchesCount() == 1 && !((<Nodes>editor.findExtensionByPartialName('Nodes'))?.holding)) {
                 let difference: Position2D = Position2D.difference(getTouchPosition(0), this.grab.position);
                 
                 this.editors.forEach((editor: Editor) => {
@@ -104,7 +106,7 @@ export class Grabbing extends EditorExtension {
                 this.grab.position = getTouchPosition(0).clone();
             }
         } else if(!isMobile()) {
-            if(!this.grab.active && isCursorOverRect(rect) && isKeyDown(' ') && !grabbing && !(blockGrabbing && blockUnderCursor)) {
+            if(!this.grab.active && isCursorOverRect(rect) && isKeyDown(' ') && !grabbing && !(blockGrabbing && blockUnderCursor) && !((<Nodes>editor.findExtensionByPartialName('Nodes'))?.holding)) {
                 this.grab.active = true;
 
                 (<Cursor>editor.findExtensionByPartialName('Cursor'))?.setCursor('grab');
@@ -115,7 +117,15 @@ export class Grabbing extends EditorExtension {
                 this.grab.active = false;
                 this.grab.holding = false;
                 grabbing = false;
-            } else if(this.grab.active && !this.grab.holding && isMouseButtonDown(0) && isCursorOverRect(rect) && !grabbing && !(blockGrabbing && blockUnderCursor)) {
+            } else if(
+                this.grab.active &&
+                !this.grab.holding &&
+                isMouseButtonDown(0) &&
+                isCursorOverRect(rect) &&
+                !grabbing &&
+                !(blockGrabbing && blockUnderCursor) &&
+                !((<Nodes>editor.findExtensionByPartialName('Nodes'))?.holding)
+            ) {
                 this.grab.holding = true;
                 this.grab.position = cursorPosition.clone();
                 grabbing = true;
@@ -132,7 +142,7 @@ export class Grabbing extends EditorExtension {
                 (<Cursor>editor.findExtensionByPartialName('Cursor'))?.setCursor('grabbing');
                 
                 this.grab.position = cursorPosition.clone();
-            } else if(this.grab.active) {
+            } else if(this.grab.active && !((<Nodes>editor.findExtensionByPartialName('Nodes'))?.holding)) {
                 (<Cursor>editor.findExtensionByPartialName('Cursor'))?.setCursor('grab');
             }
         }
