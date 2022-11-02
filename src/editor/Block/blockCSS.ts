@@ -152,6 +152,7 @@ export default `
 
 .__block__motions {
     display: flex;
+    gap: 10px;
     flex-direction: row;
     padding-bottom: 5px;
     margin-bottom: 3px;

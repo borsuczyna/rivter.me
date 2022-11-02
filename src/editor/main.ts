@@ -315,7 +315,10 @@ export class Editor {
                 startPosition.x + (halfTargetPosition.x - startPosition.x)/2,
                 startPosition.y
             ), 
-            color, 
+            color instanceof Color ? color : [
+                Color.interpolate(color[0], color[1], 0),
+                Color.interpolate(color[0], color[1], 0.5)
+            ],
             width
         );
 
@@ -326,7 +329,10 @@ export class Editor {
                 halfTargetPosition.x + (targetPosition.x - halfTargetPosition.x)/2,
                 targetPosition.y
             ), 
-            color, 
+            color instanceof Color ? color : [
+                Color.interpolate(color[0], color[1], 0.5),
+                Color.interpolate(color[0], color[1], 1)
+            ], 
             width
         );
     }

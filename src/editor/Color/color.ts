@@ -72,14 +72,6 @@ export class Color {
         return `hsl(${Math.round(hue * 360)}, ${Math.round(saturation * 100)}%, ${Math.round(lightness * 100)}%)`;
     }
 
-    static fromRGB(r: number, g: number, b: number, a: number = 255): Color {
-        return new Color(r, g, b, a);
-    }
-
-    static fromRGBA(r: number, g: number, b: number, a: number): Color {
-        return new Color(r, g, b, a);
-    }
-
     static fromHEX(hex: string): Color {
         if (hex.length === 7) {
             return new Color(
@@ -187,5 +179,22 @@ export class Color {
         this.g = this.g + (255 - this.g) * amount / 100;
         this.b = this.b + (255 - this.b) * amount / 100;
         return this;
+    }
+
+    static fromRGB(color: string): Color {
+        const regex = /rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)/;
+        const match = regex.exec(color);
+        if (match) {
+            return new Color(parseInt(match[1], 10), parseInt(match[2], 10), parseInt(match[3], 10));
+        } return new Color();
+    }
+
+    static interpolate(color1: Color, color2: Color, progress: number): Color {
+        return new Color(
+            color1.r + (color2.r - color1.r) * progress,
+            color1.g + (color2.g - color1.g) * progress,
+            color1.b + (color2.b - color1.b) * progress,
+            color1.a + (color2.a - color1.a) * progress
+        );
     }
 }

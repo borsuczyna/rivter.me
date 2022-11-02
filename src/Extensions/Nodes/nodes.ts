@@ -82,6 +82,33 @@ export class Nodes extends EditorExtension {
         return null;
     }
 
+    getNodeDOMElement(block: Block, node: NodeType, id?: number): HTMLDivElement | null {
+        let element: HTMLDivElement | null;
+
+        if(node == 'motion-start') return block.DOM.querySelector('.__motion__start .__motion__icon');
+        if(node == 'motion-next') return block.DOM.querySelector('.__motion__next .__motion__icon');
+
+        if(node == 'input') {
+            let elements: NodeListOf<HTMLDivElement> = block.DOM.querySelectorAll<HTMLDivElement>('.__block__ball__input');
+            let currentID: number = 1;
+            for(let element of elements) {
+                if(id == currentID) return element;
+                currentID++;
+            }
+        }
+
+        if(node == 'output') {
+            let elements: NodeListOf<HTMLDivElement> = block.DOM.querySelectorAll<HTMLDivElement>('.__block__ball__output');
+            let currentID: number = 1;
+            for(let element of elements) {
+                if(id == currentID) return element;
+                currentID++;
+            }
+        }
+
+        return null;
+    }
+
     private checkNodes(block: Block): NodeUnderCursor | null {
         if(!block.editor) return null;
 
@@ -182,8 +209,17 @@ export class Nodes extends EditorExtension {
                 if(position && tPosition) {
                     let startPosition: Position2D = new Position2D(position.x + position.width/1.5, position.y + position.height/2*0.9);
                     let targetPosition: Position2D = new Position2D(tPosition.x + tPosition.width/2*1.1, tPosition.y + tPosition.height/2*0.9);
-                    
-                    block.editor.easyQuadraticCurve(startPosition, targetPosition, new Color(155, 255, 50), block.editor.zoom*this.lineWidth);
+                    let editorPosition: DOMRect = block.editor.DOM.div.getBoundingClientRect();
+                    let element: HTMLDivElement | null = this.getNodeDOMElement(block, connection.type);
+                    if(!element) return;
+                    let style: CSSStyleDeclaration = getComputedStyle(element);
+
+                    block.editor.easyQuadraticCurve(
+                        Position2D.difference(startPosition, new Position2D(editorPosition.x, editorPosition.y)),
+                        Position2D.difference(targetPosition, new Position2D(editorPosition.x, editorPosition.y)),
+                        Color.fromRGB(style.borderColor),
+                        block.editor.zoom*this.lineWidth
+                    );
 
                     drawn.push({
                         block: block,
@@ -196,12 +232,25 @@ export class Nodes extends EditorExtension {
                 if(position && tPosition) {
                     let startPosition: Position2D = new Position2D(position.x + position.width/2, position.y + position.height/3);
                     let targetPosition: Position2D = new Position2D(tPosition.x + tPosition.width/2, tPosition.y + tPosition.height/3);
-                    
-                    block.editor.easyQuadraticCurve(startPosition, targetPosition, new Color(255, 50, 50), block.editor.zoom*this.lineWidth);
+                    let editorPosition: DOMRect = block.editor.DOM.div.getBoundingClientRect();
+                    let element: HTMLDivElement | null = this.getNodeDOMElement(block, connection.type, connection.startID);
+                    let element2: HTMLDivElement | null = this.getNodeDOMElement(connection.block, connection.type == 'input' ? 'output' : 'input', connection.targetID);
+                    if(!element || !element2) return;
+                    let style: CSSStyleDeclaration = getComputedStyle(element);
+                    let style2: CSSStyleDeclaration = getComputedStyle(element2);
+
+                    block.editor.easyQuadraticCurve(
+                        Position2D.difference(startPosition, new Position2D(editorPosition.x, editorPosition.y)),
+                        Position2D.difference(targetPosition, new Position2D(editorPosition.x, editorPosition.y)),
+                        [Color.fromRGB(style['background-color']), Color.fromRGB(style2['background-color'])],
+                        block.editor.zoom*this.lineWidth
+                    );
 
                     drawn.push({
                         block: block,
                         type: connection.type == 'input' ? 'output' : 'input',
+                        startID: connection.targetID,
+                        targetID: connection.startID
                     });
                 }
             }
@@ -216,10 +265,10 @@ export class Nodes extends EditorExtension {
             this.drawBlockNodeConnections(block, drawn);
         }
 
-        // let node: NodeUnderCursor | null = this.getNodeUnderCursor(editor);
-        // if(!node) return;
+        let node: NodeUnderCursor | null = this.getNodeUnderCursor(editor);
+        if(!node) return;
 
-        // editor.drawRectangle(node.position.x, node.position.y, node.position.width, node.position.height, new Color(255, 0, 0, 155));
+        editor.drawRectangle(node.position.x, node.position.y, node.position.width, node.position.height, new Color(255, 0, 0, 155));
 
     };
 }

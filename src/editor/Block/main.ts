@@ -153,6 +153,18 @@ export class Block {
         }
     }
 
+    removeConnection(type: NodeType, id?: number) {
+        if(type == 'motion-start' || type == 'motion-next') {
+            this.connections = this.connections.filter((connection: NodeConnection): boolean => {
+                return !(connection.type == type);
+            });
+        } else {
+            this.connections = this.connections.filter((connection: NodeConnection): boolean => {
+                return !(connection.type == type && connection.startID == id);
+            });
+        }
+    }
+
     findTargetConnection(block: Block, type: NodeType, id?: number): NodeConnection | null {
         if(type == 'motion-next' || type == 'motion-start') {
             return this.connections.filter((connection: NodeConnection): boolean => {
@@ -169,18 +181,6 @@ export class Block {
                     connection.targetID == id
                 );
             })[0];
-        }
-    }
-
-    removeConnection(type: NodeType, id?: number) {
-        if(type == 'motion-start' || type == 'motion-next') {
-            this.connections = this.connections.filter((connection: NodeConnection): boolean => {
-                return !(connection.type == type);
-            });
-        } else {
-            this.connections = this.connections.filter((connection: NodeConnection): boolean => {
-                return !(connection.type == type && connection.startID == id);
-            });
         }
     }
 
@@ -202,10 +202,10 @@ export class Block {
                 type: type == 'motion-start' ? 'motion-next' : 'motion-start'
             });
         } else {
-            let connection: NodeConnection | null = this.findConnection(type);
+            let connection: NodeConnection | null = this.findConnection(type == 'input' ? 'output' : 'input', startID);
             if(connection) {
-                connection.block.removeConnection(type == 'input' ? 'output' : 'input', targetID);
-                this.removeConnection(type, startID);
+                connection.block.removeConnection(type, connection.targetID);
+                this.removeConnection(type == 'input' ? 'output' : 'input', startID);
             }
 
             this.connections.push({
