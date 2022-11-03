@@ -58,7 +58,7 @@ addEventListener('contextmenu', (e) => {
     e.preventDefault();
 
     let position: Position2D = editor.getEditorFromScreenPosition(new Position2D(e.clientX, e.clientY));
-    let block = new Block('@mta-server: player-joined');
+    let block = new Block('@mta-server: random-player');
     block.position = position;
     block.updatePosition();
 

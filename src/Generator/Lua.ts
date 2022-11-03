@@ -25,6 +25,10 @@ export class LuaGenerator {
             let definition: BlockDefinition | null = this.getDefinition(editor, b.type);
             if(!definition || !definition.isEvent) continue;
 
+            if(block == b) {
+                return true;
+            }
+
             let nextBlock: Block | undefined = b;
             while(nextBlock && nextBlock.findConnection('motion-next')) {
                 if(block == nextBlock) {

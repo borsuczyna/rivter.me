@@ -7,6 +7,7 @@ import { getTouchPosition, isTouchOverRect } from "../../Editor/Mobile/position"
 import { cursorPosition, isCursorOverRect, isMouseButtonDown } from "../../Editor/Utils/cursor";
 import { BlockGrabbing } from "../Grabbing/blocks";
 import { Cursor } from "../Cursor/cursor";
+import { BlockDefinition } from "../../final";
 
 interface NodeUnderCursor {
     block: Block;
@@ -312,15 +313,23 @@ export class Nodes extends EditorExtension {
             )) {
                 if(this.lastNode && this.invertType(this.holding.element) == this.lastNode.element) {
                     let connection: NodeConnection | null = this.lastNode.block.findConnection(this.lastNode.element, this.lastNode.id);
-                    if(connection) {
-                        connection.block.removeConnection(this.invertType(this.lastNode.element), connection.targetID);
-                        this.lastNode.block.removeConnection(this.lastNode.element, this.lastNode.id);
-                    }
+                    let definition: BlockDefinition = editor.findDefinition(this.holding.block.type);
+                    let definition2: BlockDefinition = editor.findDefinition(this.lastNode.block.type);
 
-                    if(this.lastNode.element.startsWith('motion')) {
-                        this.holding.block.createConnection(this.lastNode.block, this.invertType(this.lastNode.element));
-                    } else {
-                        this.holding.block.createConnection(this.lastNode.block, this.lastNode.element, this.holding.id, this.lastNode.id);
+                    if(
+                        this.holding.element.startsWith('motion') ||
+                        (this.holding.element == 'input' ? definition.inputs : definition.outputs)[<number>this.holding.id-1].type == (this.holding.element == 'input' ? definition2.outputs : definition2.inputs)[<number>this.lastNode.id-1].type
+                    ) {
+                        if(connection) {
+                            connection.block.removeConnection(this.invertType(this.lastNode.element), connection.targetID);
+                            this.lastNode.block.removeConnection(this.lastNode.element, this.lastNode.id);
+                        }
+
+                        if(this.lastNode.element.startsWith('motion')) {
+                            this.holding.block.createConnection(this.lastNode.block, this.invertType(this.lastNode.element));
+                        } else {
+                            this.holding.block.createConnection(this.lastNode.block, this.lastNode.element, this.holding.id, this.lastNode.id);
+                        }
                     }
                 }
 
@@ -342,16 +351,25 @@ export class Nodes extends EditorExtension {
                 let editorPosition: DOMRect = this.holding.block.editor.DOM.div.getBoundingClientRect();
                 let element: HTMLDivElement | null = this.getNodeDOMElement(this.holding.block, this.holding.element, this.holding.id);
                 let element2: HTMLDivElement | null = null;
+                let canConnect: boolean = false;
 
                 if(node && this.invertType(this.holding.element) == node.element) {
                     element2 = this.getNodeDOMElement(node.block, node.element, node.id);
+                    let definition: BlockDefinition = editor.findDefinition(this.holding.block.type);
+                    let definition2: BlockDefinition = editor.findDefinition(node.block.type);
 
-                    let tPosition: DOMRect | null = this.getNodePosition(node.block, node.element, 1, node.id);
-                    if(tPosition) targetPosition = (
-                        isMotion ?
-                        new Position2D(tPosition.x + tPosition.width/2*1.1, tPosition.y + tPosition.height/2*0.9) :
-                        new Position2D(tPosition.x + tPosition.width/2, tPosition.y + tPosition.height/3)
-                    );
+                    if(
+                        this.holding.element.startsWith('motion') ||
+                        (this.holding.element == 'input' ? definition.inputs : definition.outputs)[<number>this.holding.id-1].type == (this.holding.element == 'input' ? definition2.outputs : definition2.inputs)[<number>node.id-1].type
+                    ) {
+                        canConnect = true;
+                        let tPosition: DOMRect | null = this.getNodePosition(node.block, node.element, 1, node.id);
+                        if(tPosition) targetPosition = (
+                            isMotion ?
+                            new Position2D(tPosition.x + tPosition.width/2*1.1, tPosition.y + tPosition.height/2*0.9) :
+                            new Position2D(tPosition.x + tPosition.width/2, tPosition.y + tPosition.height/3)
+                        );
+                    }
                 }
 
                 if(!element) return;
@@ -363,7 +381,7 @@ export class Nodes extends EditorExtension {
                     Position2D.difference(startPosition, new Position2D(editorPosition.x, editorPosition.y)),
                     Position2D.difference(targetPosition, new Position2D(editorPosition.x, editorPosition.y)),
                     this.holding.element.startsWith('motion') ? Color.fromRGB(style.borderColor) : (
-                        style2 ? [Color.fromRGB(style['background-color']), Color.fromRGB(style2['background-color'])] : Color.fromRGB(style['background-color'])
+                        (style2 && canConnect) ? [Color.fromRGB(style['background-color']), Color.fromRGB(style2['background-color'])] : Color.fromRGB(style['background-color'])
                     ),
                     this.holding.block.editor.zoom*this.lineWidth
                 );
