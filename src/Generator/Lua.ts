@@ -20,6 +20,12 @@ export class LuaGenerator {
     private variableID: number = 1;
     private localVariableID: number = 1;
     private definedVariables: DefinedVariable[] = [];
+    private tabValue: number = 0;
+    tabCharacter: string = '    ';
+
+    private getTabValue(): string {
+        return new Array(this.tabValue).fill(this.tabCharacter).join('');
+    }
 
     private getScope(editor: Editor, block: Block): number | null {
         let scope: number = 0;
@@ -95,7 +101,7 @@ export class LuaGenerator {
     }
 
     private addCode(code: GeneratedCode) {
-        this.code += `${code}\n`;
+        this.code += `${this.getTabValue()}${code}\n`;
     }
 
     private argValues(args: ArgumentValue[]): string[] {
@@ -181,7 +187,7 @@ export class LuaGenerator {
 
         this.addCode(`${preArgs || ''}${code}`);
         for(let variable of localVariables) {
-            this.addCode(`${variable[0]} = ${variable[1]}`)
+            this.addCode(`    ${variable[0]} = ${variable[1]}`)
         }
     }
 
@@ -215,10 +221,20 @@ export class LuaGenerator {
         // Generate header
         this.generateCode(editor, block, definition.generateCode.header, preArgs);
 
+        // Add tab if it's element with footer
+        if(definition.generateCode.footer) {
+            this.tabValue++;
+        }
+
         // Generate next connected motion block
         let motionNext: NodeConnection | null = block.findConnection('motion-next');
         if(motionNext) {
             this.generateBlock(editor, motionNext.block);
+        }
+
+        // Remove tab if it's element with footer
+        if(definition.generateCode.footer) {
+            this.tabValue--;
         }
 
         // Generate footer
@@ -231,7 +247,9 @@ export class LuaGenerator {
         // restore default generator settings
         this.code = '';
         this.variableID = 1;
+        this.localVariableID = 1;
         this.definedVariables = [];
+        this.tabValue = 0;
 
         // foreach all event blocks and generate them
         for(let block of editor.blocks) {
