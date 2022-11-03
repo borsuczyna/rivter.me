@@ -7,6 +7,9 @@
         <title>rivter.me</title>
 
         <script src="./test.ts" type="module" defer></script>
+        <link rel="stylesheet"
+        href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/default.min.css">
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
 
         <style>
             body {
@@ -24,14 +27,25 @@
 
             .editor-window {
                 background-color: rgb(24, 24, 24);
-                border-radius: 0.5em;
+                border-radius: 0;
                 width: 100vw;
-                height: 100vh;
+                height: 50vh;
+            }
+
+            #code-output {
+                color: white;
+                background-color: rgb(30, 30, 30);
+                display: block;
+                padding: 1em;
+                border-radius: 0.5em;
+                position: absolute;
+                transform: translate(-50%, 0%);
             }
         </style>
     </head>
     <body>
         <div class="editor-window" id="editor"></div>
         <!-- <div class="editor-window" id="editor2"></div> -->
+        <pre><code class="language-lua" id="code-output"></code></pre>
     </body>
 </html>

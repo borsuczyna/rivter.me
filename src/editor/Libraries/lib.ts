@@ -26,8 +26,8 @@ export interface BlockDefinition {
     outputs: NodeDefintion[];               /* Outputs */
 
     generateCode: {
-        header: () => string;
-        footer?: () => string;
+        header: (...args: any[]) => string;
+        footer?: (...args: any[]) => string;
     };
 
     isEvent?: boolean;                      /* Is block event - action starts with it */

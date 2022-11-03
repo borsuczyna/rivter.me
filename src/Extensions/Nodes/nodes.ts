@@ -270,7 +270,7 @@ export class Nodes extends EditorExtension {
     private lastNode: NodeUnderCursor | null;
 
     update = (editor: Editor) => {
-        let visible: Block[] = editor.getVisibleBlocks();
+        let visible: Block[] = editor.blocks;//editor.getVisibleBlocks();
         let drawn: NodeConnection[] = [];
 
         for(let block of visible) {

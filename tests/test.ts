@@ -1,4 +1,5 @@
-import { Editor, Background, Grabbing, Zooming, Block, Color, BlockGrabbing, Cursor, Position2D, Debug, isMobile, Nodes, styleMonokai, styleUnity } from "../src/final";
+import { Editor, Background, Grabbing, Zooming, Block, Color, BlockGrabbing, Cursor, Position2D, Debug, isMobile, Nodes, styleMonokai, styleUnity, LuaGenerator } from "../src/final";
+import hljs from 'highlight.js';
 
 const editorDOM: HTMLDivElement = <HTMLDivElement> document.getElementById('editor');
 
@@ -10,6 +11,8 @@ const cursor: Cursor = new Cursor();
 const debug: Debug = new Debug();
 const nodes: Nodes = new Nodes();
 // blockGrabbing.mobileSupport = false;
+
+const generator: LuaGenerator = new LuaGenerator();
 
 // grabbing.limits.minX = 0;
 // grabbing.limits.maxX = 200;
@@ -55,12 +58,18 @@ addEventListener('contextmenu', (e) => {
     e.preventDefault();
 
     let position: Position2D = editor.getEditorFromScreenPosition(new Position2D(e.clientX, e.clientY));
-    let block = new Block('@mta-server: player-joined');
+    let block = new Block('@mta-server: random-player');
     block.position = position;
     block.updatePosition();
 
     editor.addBlock(block);
-})
+});
+
+// @ts-ignore
+window.generate = () => {
+    // @ts-ignore
+    document.getElementById('code-output').innerHTML = hljs.highlight('lua', generator.generateProject(editor)).value;
+}
 
 // const editorDOM2: HTMLDivElement = <HTMLDivElement> document.getElementById('editor2');
 // const editor2: Editor = new Editor();
@@ -83,7 +92,7 @@ addEventListener('contextmenu', (e) => {
 // background2.gridSize = 30;
 // background2.gridWidth = 1;
 
-// let requestAnimationFrame = (callback) => setTimeout(callback, 0)
+let requestAnimationFrame = (callback) => setTimeout(callback, 0)
 
 function updateEditor() {
     requestAnimationFrame(updateEditor);

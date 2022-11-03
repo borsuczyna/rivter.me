@@ -20,7 +20,7 @@ export const definitions: BlockDefinitions = {
         isEvent: true,
 
         generateCode: {
-            header: () => 'addEventHandler("onPlayerJoin", resourceRoot, function()',
+            header: () => 'addEventHandler("onPlayerJoin", root, function({var1})',
             footer: () => 'end)'
         }
     },
@@ -42,7 +42,7 @@ export const definitions: BlockDefinitions = {
                 type: 'string',
                 inputText: {
                     placeholder: 'message',
-                    default: ''
+                    default: 'Hello, world!'
                 }
             },
             {
@@ -64,11 +64,32 @@ export const definitions: BlockDefinitions = {
             },
         ],
         
-        isEvent: true,
+        isEvent: false,
 
         generateCode: {
-            header: () => 'addEventHandler("onPlayerJoin", resourceRoot, function()',
-            footer: () => 'end)'
+            header: (player, message) => `outputChatBox(${message}, ${player}, 255, 255, 255, false);`,
+        }
+    },
+    '@mta-server: random-player': {
+        name: 'Get random player',
+        hoverTip: 'Returns random player',
+
+        motionStart: false,
+        motionNext: false,
+
+        inputs: [],
+        outputs: [
+            {
+                name: 'Player',
+                hoverTip: 'random player',
+                type: 'player',
+            },
+        ],
+        
+        isEvent: false,
+
+        generateCode: {
+            header: () => `getRandomPlayer();`,
         }
     },
 };

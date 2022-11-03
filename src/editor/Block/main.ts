@@ -1,4 +1,4 @@
-import { BlockDefinition, BlockNode, BlockNodes, NodeDefintion } from "../Libraries/lib";
+import { BlockDefinition, BlockNode, BlockNodes, BlockType, NodeDefintion } from "../Libraries/lib";
 import { Editor } from "../main";
 import { isMobile } from "../Mobile/check";
 import { getTouchesCount, getTouchPosition, isTouchOverRect } from "../Mobile/position";
@@ -23,10 +23,11 @@ export interface NodeConnection {
 export class Block {
     position: Position2D = new Position2D(0, 0);
     token: string = Token.generate(32);
-    type: string;
+    type: BlockType;
     DOM: HTMLDivElement;
     editor: Editor;
     connections: NodeConnection[] = [];
+    values: string[] = [];
 
     constructor(type) {
         this.type = type;

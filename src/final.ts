@@ -17,6 +17,8 @@ export * from './Extensions/Cursor/cursor';
 export * from './Extensions/Debug/debug';
 export * from './Extensions/Nodes/nodes';
 
+export * from './Generator/Lua';
+
 export * from './Styles/white';
 export * from './Styles/monokai';
 export * from './Styles/unity';
