@@ -18,34 +18,48 @@ interface DefinedVariable {
 export class LuaGenerator {
     private code: GeneratedCode = '';
     private variableID: number = 1;
+    private localVariableID: number = 1;
     private definedVariables: DefinedVariable[] = [];
 
-    private willBlockBeUsed(editor: Editor, block: Block): boolean {
+    private getScope(editor: Editor, block: Block): number | null {
+        let scope: number = 0;
         for(let b of editor.blocks) {
             let definition: BlockDefinition | null = this.getDefinition(editor, b.type);
             if(!definition || !definition.isEvent) continue;
 
             if(block == b) {
-                return true;
+                return scope;
             }
 
             let nextBlock: Block | undefined = b;
             while(nextBlock && nextBlock.findConnection('motion-next')) {
                 if(block == nextBlock) {
-                    return true;
+                    return scope;
                 }
                 
                 nextBlock = nextBlock.findConnection('motion-next')?.block;
             }
+
+            scope++;
         }
 
-        return false;
+        return null;
+    }
+
+    private willBlockBeUsed(editor: Editor, block: Block): boolean {
+        return this.getScope(editor, block) != null;
     }
 
     private getFreeVariable(): string {
         let id = this.variableID;
         this.variableID++;
         return `__var${id}`;
+    }
+
+    private getLocalFreeVariable(): string {
+        let id = this.localVariableID;
+        this.localVariableID++;
+        return `__local__var${id}`;
     }
 
     private addVariable(block: Block, id: number): string {
@@ -154,14 +168,21 @@ export class LuaGenerator {
         code = callback(...this.argValues(args));
 
         let eventVar: number = 1;
+        let localVariables: string[][] = [];
         while(code.search(`{var${eventVar}}`) != -1) {
             let variable: string = this.getVariable(block, eventVar);
-            code = code.replace(`{var${eventVar}}`, variable);
+            let localVariable: string = this.getLocalFreeVariable();
+
+            code = code.replace(`{var${eventVar}}`, localVariable);
+            localVariables.push([variable, localVariable])
 
             eventVar++;
         }
 
         this.addCode(`${preArgs || ''}${code}`);
+        for(let variable of localVariables) {
+            this.addCode(`${variable[0]} = ${variable[1]}`)
+        }
     }
 
     private generateBlock(editor: Editor, block: Block, localVariables: boolean = false): string[] {
@@ -217,6 +238,7 @@ export class LuaGenerator {
             let definition: BlockDefinition | null = this.getDefinition(editor, block.type);
             if(!definition || !definition.isEvent) continue;
 
+            this.localVariableID = 1;
             this.generateBlock(editor, block);
         }
 
