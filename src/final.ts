@@ -16,6 +16,7 @@ export * from './Extensions/Grabbing/blocks';
 export * from './Extensions/Cursor/cursor';
 export * from './Extensions/Debug/debug';
 export * from './Extensions/Nodes/nodes';
+export * from './Extensions/DotNodes/DotNodes';
 
 export * from './Generator/Lua';
 

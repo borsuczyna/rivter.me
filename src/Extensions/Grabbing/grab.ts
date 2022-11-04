@@ -7,7 +7,8 @@ import { Position2D } from "../../Editor/Position/2D";
 import { cursorPosition, isCursorOverRect, isMouseButtonDown } from "../../Editor/Utils/cursor";
 import { isKeyDown } from "../../Editor/Utils/keyboard";
 import { BlockGrabbing } from "./blocks";
-import { Nodes } from "../../final";
+import { Nodes } from "../../Extensions/Nodes/nodes";
+import { DotNodes } from "../../Extensions/DotNodes/DotNodes";
 
 interface GrabData {
     position: Position2D;
@@ -28,7 +29,7 @@ interface GrabLimits {
     maxY: number;
 };
 
-export var grabbing: boolean = false;
+export let grabbing: boolean = false;
 
 export class Grabbing extends EditorExtension {
     name: string = '@borsuk - Grabbing';
@@ -87,7 +88,9 @@ export class Grabbing extends EditorExtension {
                 !grabbing &&
                 !this.grab.holding &&
                 !(blockGrabbing && blockUnderCursor) &&
-                !((<Nodes>editor.findExtensionByPartialName('Nodes'))?.holding)
+                !((<Nodes>editor.findExtensionByPartialName('Nodes'))?.holding) &&
+                !((<DotNodes>editor.findExtensionByPartialName('Dot nodes'))?.holding) &&
+                !((<DotNodes>editor.findExtensionByPartialName('Dot nodes'))?.getDotUnderCursor())
             ) {
                 this.grab.holding = true;
                 this.grab.position = getTouchPosition(0).clone();
@@ -124,7 +127,9 @@ export class Grabbing extends EditorExtension {
                 isCursorOverRect(rect) &&
                 !grabbing &&
                 !(blockGrabbing && blockUnderCursor) &&
-                !((<Nodes>editor.findExtensionByPartialName('Nodes'))?.holding)
+                !((<Nodes>editor.findExtensionByPartialName('Nodes'))?.holding) &&
+                !((<DotNodes>editor.findExtensionByPartialName('Dot nodes'))?.holding) &&
+                !((<DotNodes>editor.findExtensionByPartialName('Dot nodes'))?.getDotUnderCursor())
             ) {
                 this.grab.holding = true;
                 this.grab.position = cursorPosition.clone();
@@ -142,7 +147,12 @@ export class Grabbing extends EditorExtension {
                 (<Cursor>editor.findExtensionByPartialName('Cursor'))?.setCursor('grabbing');
                 
                 this.grab.position = cursorPosition.clone();
-            } else if(this.grab.active && !((<Nodes>editor.findExtensionByPartialName('Nodes'))?.holding)) {
+            } else if(
+                this.grab.active &&
+                !((<Nodes>editor.findExtensionByPartialName('Nodes'))?.holding) &&
+                !((<DotNodes>editor.findExtensionByPartialName('Dot nodes'))?.holding) &&
+                !((<DotNodes>editor.findExtensionByPartialName('Dot nodes'))?.getDotUnderCursor())
+            ) {
                 (<Cursor>editor.findExtensionByPartialName('Cursor'))?.setCursor('grab');
             }
         }

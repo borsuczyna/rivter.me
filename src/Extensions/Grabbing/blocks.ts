@@ -7,6 +7,7 @@ import { Position2D } from "../../Editor/Position/2D";
 import { cursorPosition, isMouseButtonDown } from "../../Editor/Utils/cursor";
 import { Grabbing } from "./grab";
 import { Nodes } from "../../final";
+import { DotNodes } from "../../Extensions/DotNodes/DotNodes";
 
 const buildTime: number = new Date().getTime();
 
@@ -72,7 +73,11 @@ export class BlockGrabbing extends EditorExtension {
         let hoveredPart: string | boolean = overBlock.getOverPart();
         if(!hoveredPart) return;
 
-        if(hoveredPart == 'header' && !((<Nodes>editor.findExtensionByPartialName('Nodes'))?.holding)) {
+        if(
+            hoveredPart == 'header' && 
+            !((<Nodes>editor.findExtensionByPartialName('Nodes'))?.holding) &&
+            !((<DotNodes>editor.findExtensionByPartialName('Dot nodes'))?.holding)
+        ) {
             (<Cursor>editor.findExtensionByPartialName('Cursor'))?.setCursor('grab');
 
             if(isMouseButtonDown(0) || (isMobile() && this.mobileSupport)) {

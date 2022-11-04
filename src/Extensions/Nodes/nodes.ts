@@ -8,6 +8,7 @@ import { cursorPosition, isCursorOverRect, isMouseButtonDown } from "../../Edito
 import { BlockGrabbing } from "../Grabbing/blocks";
 import { Cursor } from "../Cursor/cursor";
 import { BlockDefinition } from "../../final";
+import { DotNodes } from "../../Extensions/DotNodes/DotNodes";
 
 interface NodeUnderCursor {
     block: Block;
@@ -37,7 +38,7 @@ export class Nodes extends EditorExtension {
     }
 
     initialize = (editor: Editor) => {
-
+        if(this.editors.length > 1) throw new Error('Nodes extension can be used only on one editor at once!');
     };
 
     private calculatePosition(element: HTMLDivElement, editor: Editor, scale: number = 1, addPos: number = 0, mult: number = 1.2): DOMRect {
@@ -292,12 +293,15 @@ export class Nodes extends EditorExtension {
                     isMobile() && getTouchPosition(0).x != 0 && getTouchPosition(0).y != 0
                 )
             ) &&
-            !((<BlockGrabbing>editor.findExtensionByPartialName('Block grabbing'))?.holding)
+            !((<BlockGrabbing>editor.findExtensionByPartialName('Block grabbing'))?.holding) &&
+            !((<DotNodes>editor.findExtensionByPartialName('Dot nodes'))?.holding)
         ) {
             let connection: NodeConnection | null = node.block.findConnection(node.element, node.id);
             if(connection) {
-                connection.block.removeConnection(this.invertType(node.element), connection.targetID);
-                node.block.removeConnection(node.element, node.id);
+                if(node.element != 'output') {
+                    connection.block.removeConnection(this.invertType(node.element), connection.targetID);
+                    node.block.removeConnection(node.element, node.id);
+                }
             }
 
             this.holding = {
@@ -321,8 +325,10 @@ export class Nodes extends EditorExtension {
                         (this.holding.element == 'input' ? definition.inputs : definition.outputs)[<number>this.holding.id-1].type == (this.holding.element == 'input' ? definition2.outputs : definition2.inputs)[<number>this.lastNode.id-1].type
                     ) {
                         if(connection) {
-                            connection.block.removeConnection(this.invertType(this.lastNode.element), connection.targetID);
-                            this.lastNode.block.removeConnection(this.lastNode.element, this.lastNode.id);
+                            if(this.lastNode.element != 'output' && connection.type != 'input') {
+                                connection.block.removeConnection(this.invertType(this.lastNode.element), connection.targetID);
+                                this.lastNode.block.removeConnection(this.lastNode.element, this.lastNode.id);
+                            }
                         }
 
                         if(this.lastNode.element.startsWith('motion')) {

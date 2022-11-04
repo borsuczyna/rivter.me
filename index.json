@@ -1,0 +1,14 @@
+{
+    "extends": "@parcel/config-default",
+    "transformers": {
+      "*.svg": ["...", "@parcel/transformer-svg-react"]
+    },
+    "namers": ["@company/parcel-namer", "..."],
+    "compressors": {
+      "*.{js,html,css,ts}": [
+        "...",
+        "@parcel/compressor-gzip", 
+        "@parcel/compressor-brotli"
+      ]
+    }
+  }

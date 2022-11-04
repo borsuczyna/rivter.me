@@ -1,5 +1,5 @@
 import { Editor, Background, Grabbing, Zooming, Block, Color, BlockGrabbing, Cursor, Position2D, Debug, isMobile, Nodes, styleMonokai, styleUnity, LuaGenerator } from "../src/final";
-import hljs from 'highlight.js';
+import { DotNodes } from '../src/Extensions/DotNodes/DotNodes';
 
 const editorDOM: HTMLDivElement = <HTMLDivElement> document.getElementById('editor');
 
@@ -10,6 +10,7 @@ const blockGrabbing: BlockGrabbing = new BlockGrabbing();
 const cursor: Cursor = new Cursor();
 const debug: Debug = new Debug();
 const nodes: Nodes = new Nodes();
+const dots: DotNodes = new DotNodes();
 // blockGrabbing.mobileSupport = false;
 
 const generator: LuaGenerator = new LuaGenerator();
@@ -38,6 +39,8 @@ zooming.max = 3;
 
 import * as MTAServer from './libraries/MTA-Server';
 
+dots.createDot(new Position2D(250, 250));
+
 const editor = new Editor(editorDOM)
 .use(grabbing)
 .use(zooming)
@@ -45,6 +48,8 @@ const editor = new Editor(editorDOM)
 .use(blockGrabbing)
 .use(cursor)
 .use(nodes)
+.use(dots)
+// .use(dots)
 // .use(debug)
 .loadLibrary(MTAServer.definitions, MTAServer.nodes)
 .addBlock(block)
@@ -58,7 +63,7 @@ addEventListener('contextmenu', (e) => {
     e.preventDefault();
 
     let position: Position2D = editor.getEditorFromScreenPosition(new Position2D(e.clientX, e.clientY));
-    let block = new Block('@mta-server: player-joined');
+    let block = new Block('@mta-server: send-message');
     block.position = position;
     block.updatePosition();
 
@@ -66,11 +71,11 @@ addEventListener('contextmenu', (e) => {
 });
 
 // @ts-ignore
-window.generate = () => {
+document.getElementById('generate')?.addEventListener('click', () => {
     // @ts-ignore
     document.getElementById('code-output').innerHTML = hljs.highlight('lua', generator.generateProject(editor)).value;
     editor.updateDimensions();
-}
+});
 
 // const editorDOM2: HTMLDivElement = <HTMLDivElement> document.getElementById('editor2');
 // const editor2: Editor = new Editor();
