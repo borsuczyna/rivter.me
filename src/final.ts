@@ -17,6 +17,7 @@ export * from './Extensions/Cursor/cursor';
 export * from './Extensions/Debug/debug';
 export * from './Extensions/Nodes/nodes';
 export * from './Extensions/DotNodes/DotNodes';
+export * from './Extensions/CodeVisual/CodeVisual';
 
 export * from './Generator/Lua';
 

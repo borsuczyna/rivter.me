@@ -77,6 +77,8 @@ export class Editor {
         this.DOM.div.style.setProperty('--board-height', `${rect.height}px`);
 
         this.updateCanvasDimensions();
+
+        this.update();
     }
 
     updatePosition() {
@@ -171,6 +173,14 @@ export class Editor {
         )
 
         return outPosition;
+    }
+
+    getBlockByToken(token: string): Block | null {
+        for(let block of this.blocks) {
+            if(block.token == token) return block;
+        }
+
+        return null;
     }
 
     addBlock(block: Block) {

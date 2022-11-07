@@ -186,7 +186,15 @@ export class Color {
     }
 
     static fromRGB(color: string): Color {
-        const regex = /rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)/;
+        const regex = /rgb\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)/;
+        const match = regex.exec(color);
+        if (match) {
+            return new Color(parseInt(match[1], 10), parseInt(match[2], 10), parseInt(match[3], 10));
+        } return new Color();
+    }
+
+    static fromRaw(color: string): Color {
+        const regex = /(\d{1,3}), ?(\d{1,3}), ?(\d{1,3})/;
         const match = regex.exec(color);
         if (match) {
             return new Color(parseInt(match[1], 10), parseInt(match[2], 10), parseInt(match[3], 10));

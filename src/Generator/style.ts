@@ -1,5 +1,5 @@
 export default `
-.__lua__variable {
+.__block__variable__definition {
     --color: 255, 255, 255;
 
     color: white;
@@ -9,7 +9,7 @@ export default `
     border-radius: 4px;
 }
 
-.__lua__variable:hover {
+.__block__variable__definition:hover {
     background-color: rgba(var(--color), 0.3);
     transition: 0.1s;
 }

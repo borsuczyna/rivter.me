@@ -1,4 +1,4 @@
-import { Block, NodeConnection } from '../Editor/Block/main';
+import { Block, NodeConnection, NodeType } from '../Editor/Block/main';
 import { Editor } from '../Editor/main';
 import { BlockDefinition, BlockType, NodeDefintion, BlockNode } from '../Editor/Libraries/lib';
 import replaceAll from 'string.prototype.replaceall';
@@ -26,6 +26,7 @@ export class LuaGenerator {
     private localVariableID: number = 1;
     private definedVariables: DefinedVariable[] = [];
     private tabValue: number = 0;
+    private editor: Editor;
     tabCharacter: string = '    ';
     htmlHighlights: boolean = false;
 
@@ -91,10 +92,14 @@ export class LuaGenerator {
     private getVariable(block: Block, id: number): string {
         for(let variable of this.definedVariables) {
             if(variable.block == block && variable.id == id) {
-                return variable.variable;
+                if(this.htmlHighlights) {
+                    let definition: BlockDefinition = this.editor.findDefinition(block.type);
+                    let node: BlockNode = this.editor.findNode(definition.outputs[id-1].type);
+                    return this.htmlDefinition(variable.variable, node.color.raw, block, 'output', id-1);
+                } else return variable.variable;
             }
         }
-
+        
         return this.addVariable(block, id);
     }
 
@@ -175,8 +180,8 @@ export class LuaGenerator {
         return args;
     }
 
-    private htmlDefinition(variable: string, color: string = '255, 255, 255', callback: CallableFunction | string = '() => {}') {
-        return `<div class="__lua__variable" style="--color: ${color}" onclick='(${callback})()'>${variable}</div>`;
+    private htmlDefinition(variable: string, color: string = '255, 255, 255', block: Block, type: NodeType, id: number) {
+        return `<div class="__block__variable__definition" style="--color: ${color}" color="${color}" block="${block.token}" outputType="${type}" outputId="${id}">${variable}</div>`;
     }
 
     private generateCode(editor: Editor, block: Block, callback: CallableFunction, preArgs?: string): void {
@@ -191,7 +196,13 @@ export class LuaGenerator {
             let variable: string = this.getVariable(block, eventVar);
             let localVariable: string = this.getLocalFreeVariable();
 
-            code = code.replace(`{var${eventVar}}`, localVariable);
+            let definition: BlockDefinition | null = this.getDefinition(editor, block.type);
+            let output: NodeDefintion | undefined = definition?.outputs[eventVar-1];
+            let node: BlockNode | undefined = output ? editor.findNode(output.type) : undefined;
+
+            if(this.htmlHighlights) {
+                code = code.replace(`{var${eventVar}}`, this.htmlDefinition(localVariable, node?.color.raw, block, 'output', eventVar-1));
+            } else code = code.replace(`{var${eventVar}}`, localVariable);
             localVariables.push([variable, localVariable])
 
             eventVar++;
@@ -204,9 +215,7 @@ export class LuaGenerator {
                 let definition: BlockDefinition | null = this.getDefinition(editor, block.type);
                 let output: NodeDefintion | undefined = definition?.outputs[id];
                 let node: BlockNode | undefined = output ? editor.findNode(output.type) : undefined;
-                this.addCode(`    ${this.htmlDefinition(variable[0], node?.color.raw, () => {
-                    
-                })} = ${this.htmlDefinition(variable[1], node?.color.raw)}`);
+                this.addCode(`    ${this.htmlDefinition(variable[0], node?.color.raw, block, 'output', id)} = ${this.htmlDefinition(variable[1], node?.color.raw, block, 'output', id)}`);
             } else this.addCode(`    ${variable[0]} = ${variable[1]}`)
 
             id++;
@@ -228,15 +237,35 @@ export class LuaGenerator {
                     args.push(this.getFreeVariable());
                 }
 
-                preArgs = (`local ${args.join(', ')} = `);
+                if(this.htmlHighlights) {
+                    let id: number = 0;
+                    preArgs = (`local ${args.map((arg: string): string => {
+                        let output: NodeDefintion | undefined = definition?.outputs[id];
+                        if(output) {
+                            let node: BlockNode = editor.findNode(output.type);
+                            return this.htmlDefinition(arg, node.color.raw, block, 'output', id++);
+                        } else return arg;
+                    }).join(', ')} = `);
+                }
+                else preArgs = (`local ${args.join(', ')} = `);
             } else {            
                 for(let i in definition.outputs) {
                     let outputID: number = parseInt(i);
                     let output: NodeDefintion = definition.outputs[i];
-                    args.push(this.getVariable(block, outputID));
+                    args.push(this.getVariable(block, outputID+1));
                 }
 
-                preArgs = (`${args.join(', ')} = `);
+                if(this.htmlHighlights) {
+                    let id: number = 0;
+                    preArgs = (`${args.map((arg: string): string => {
+                        let output: NodeDefintion | undefined = definition?.outputs[id];
+                        if(output) {
+                            let node: BlockNode = editor.findNode(output.type);
+                            return this.htmlDefinition(arg, node.color.raw, block, 'output', id++);
+                        } else return arg;
+                    }).join(', ')} = `);
+                }
+                else preArgs = (`${args.join(', ')} = `);
             }
         }
 
@@ -266,6 +295,7 @@ export class LuaGenerator {
     }
 
     generateProject(editor: Editor): GeneratedCode {
+        this.editor = editor;
         // restore default generator settings
         this.code = '';
         this.variableID = 1;
