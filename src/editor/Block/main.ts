@@ -166,6 +166,12 @@ export class Block {
         }
     }
 
+    removeTargetConnection(type: NodeType, startID: number, targetBlock: Block, targetID: number) {
+        this.connections = this.connections.filter((connection: NodeConnection): boolean => {
+            return !(connection.type == type && connection.startID == startID && connection.block == targetBlock && connection.targetID == targetID);
+        });
+    }
+
     findTargetConnection(block: Block, type: NodeType, id?: number): NodeConnection | null {
         if(type == 'motion-next' || type == 'motion-start') {
             return this.connections.filter((connection: NodeConnection): boolean => {
@@ -205,8 +211,19 @@ export class Block {
         } else {
             let connection: NodeConnection | null = this.findConnection(type == 'input' ? 'output' : 'input', startID);
             if(connection) {
-                connection.block.removeConnection(type, connection.targetID);
-                this.removeConnection(type == 'input' ? 'output' : 'input', startID);
+                if(connection.type == 'input') {
+                    connection.block.removeConnection(type, connection.targetID);
+                    this.removeConnection(type == 'input' ? 'output' : 'input', startID);
+                }
+            } else if(type == 'input') {
+                connection = block.findConnection('input', startID);
+                if(connection) {
+                    let connection2: NodeConnection | null = connection.block.findConnection('output', connection.targetID);
+                    if(connection2) {
+                        connection2.block.removeConnection('input', connection2.targetID);
+                        connection.block.removeConnection('output', connection.targetID);
+                    }
+                }
             }
 
             this.connections.push({

@@ -41,12 +41,16 @@
                 /* position: absolute;
                 transform: translate(-50%, 0%); */
             }
+
+            .code-highlight * {
+                display: inline-block;
+            }
         </style>
     </head>
     <body>
         <div class="editor-window" id="editor"></div>
         <!-- <div class="editor-window" id="editor2"></div> -->
-        <pre><code class="language-lua" id="code-output"></code></pre>
+        <pre><code class="language-lua code-highlight" id="code-output"></code></pre>
         <button id="generate">generate</button>
     </body>
 </html>

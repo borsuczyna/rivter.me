@@ -8,7 +8,7 @@ import { cursorPosition, isCursorOverRect, isMouseButtonDown } from "../../Edito
 import { BlockGrabbing } from "../Grabbing/blocks";
 import { Cursor } from "../Cursor/cursor";
 import { BlockDefinition } from "../../final";
-import { DotNodes } from "../../Extensions/DotNodes/DotNodes";
+import { Dot, DotNodes } from "../../Extensions/DotNodes/DotNodes";
 
 interface NodeUnderCursor {
     block: Block;
@@ -280,6 +280,8 @@ export class Nodes extends EditorExtension {
         }
         
         let node: NodeUnderCursor | null = this.getNodeUnderCursor(editor);
+        let dotNodes: DotNodes | null = (<DotNodes>editor.findExtensionByPartialName('Dot nodes'));
+        let dot: Dot | null = dotNodes?.getDotUnderCursor();
         if(node || this.holding) {
             (<Cursor>editor.findExtensionByPartialName('Cursor'))?.setCursor('cell');
         }
@@ -343,7 +345,7 @@ export class Nodes extends EditorExtension {
                 return;
             }
 
-            let position: DOMRect | null = this.getNodePosition(this.holding.block, this.holding.element, 1, this.holding.id);
+            let position: DOMRect | undefined | null = this.getNodePosition(this.holding.block, this.holding.element, 1, this.holding.id);
             if(position) {
                 let isMotion: boolean = (this.holding.element == 'motion-start' || this.holding.element == 'motion-next');
                 
@@ -358,6 +360,9 @@ export class Nodes extends EditorExtension {
                 let element: HTMLDivElement | null = this.getNodeDOMElement(this.holding.block, this.holding.element, this.holding.id);
                 let element2: HTMLDivElement | null = null;
                 let canConnect: boolean = false;
+
+                if(!element) return;
+                let style: CSSStyleDeclaration = getComputedStyle(element);
 
                 if(node && this.invertType(this.holding.element) == node.element) {
                     element2 = this.getNodeDOMElement(node.block, node.element, node.id);
@@ -376,10 +381,17 @@ export class Nodes extends EditorExtension {
                             new Position2D(tPosition.x + tPosition.width/2, tPosition.y + tPosition.height/3)
                         );
                     }
+                } else if(dot) {
+                    let tPosition: DOMRect | undefined = dotNodes?.getRect(dot);
+                    if(tPosition) targetPosition = (
+                        isMotion ?
+                        new Position2D(tPosition.x + tPosition.width/2, tPosition.y + tPosition.height/2) :
+                        new Position2D(tPosition.x + tPosition.width/2, tPosition.y + tPosition.height/2)
+                    );
+
+                    dot.tempColor = style['background-color'];
                 }
 
-                if(!element) return;
-                let style: CSSStyleDeclaration = getComputedStyle(element);
                 let style2: CSSStyleDeclaration | null = null;
                 if(element2) style2 = getComputedStyle(element2);
 

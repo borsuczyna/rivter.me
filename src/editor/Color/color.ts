@@ -23,6 +23,10 @@ export class Color {
         return `#${this.r << 16 | this.g << 8 | this.b}`;
     }
 
+    get raw(): string {
+        return `${this.r}, ${this.g}, ${this.b}`;
+    }
+
     get hsla(): string {
         let hue = 0;
         let saturation = 0;

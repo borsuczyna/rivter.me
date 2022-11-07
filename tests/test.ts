@@ -1,5 +1,5 @@
 import { Editor, Background, Grabbing, Zooming, Block, Color, BlockGrabbing, Cursor, Position2D, Debug, isMobile, Nodes, styleMonokai, styleUnity, LuaGenerator } from "../src/final";
-import { DotNodes } from '../src/Extensions/DotNodes/DotNodes';
+// import { DotNodes } from '../src/Extensions/DotNodes/DotNodes';
 
 const editorDOM: HTMLDivElement = <HTMLDivElement> document.getElementById('editor');
 
@@ -10,7 +10,7 @@ const blockGrabbing: BlockGrabbing = new BlockGrabbing();
 const cursor: Cursor = new Cursor();
 const debug: Debug = new Debug();
 const nodes: Nodes = new Nodes();
-const dots: DotNodes = new DotNodes();
+// const dots: DotNodes = new DotNodes();
 // blockGrabbing.mobileSupport = false;
 
 const generator: LuaGenerator = new LuaGenerator();
@@ -31,7 +31,7 @@ const block2 = new Block('@mta-server: send-message');
 block2.position.set(350, 0);
 block2.updatePosition();
 block.createConnection(block2, 'motion-next');
-block.createConnection(block2, 'input', 1, 2);
+// block.createConnection(block2, 'input', 1, 2);
 block.createConnection(block2, 'input', 1, 1);
 
 zooming.min = 0.3;
@@ -39,7 +39,7 @@ zooming.max = 3;
 
 import * as MTAServer from './libraries/MTA-Server';
 
-dots.createDot(new Position2D(250, 250));
+// dots.createDot(new Position2D(250, 250));
 
 const editor = new Editor(editorDOM)
 .use(grabbing)
@@ -48,7 +48,7 @@ const editor = new Editor(editorDOM)
 .use(blockGrabbing)
 .use(cursor)
 .use(nodes)
-.use(dots)
+// .use(dots)
 // .use(dots)
 // .use(debug)
 .loadLibrary(MTAServer.definitions, MTAServer.nodes)
@@ -72,8 +72,14 @@ addEventListener('contextmenu', (e) => {
 
 // @ts-ignore
 document.getElementById('generate')?.addEventListener('click', () => {
+    generator.htmlHighlights = true;
+
     // @ts-ignore
-    document.getElementById('code-output').innerHTML = hljs.highlight('lua', generator.generateProject(editor)).value;
+    // document.getElementById('code-output').innerHTML = hljs.highlight(generator.generateProject(editor), {
+    //     language: 'lua'
+    // }).value;
+
+    document.getElementById('code-output').innerHTML = generator.generateProject(editor);
     editor.updateDimensions();
 });
 

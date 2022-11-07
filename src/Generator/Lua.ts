@@ -1,7 +1,12 @@
 import { Block, NodeConnection } from '../Editor/Block/main';
 import { Editor } from '../Editor/main';
-import { BlockDefinition, BlockType, NodeDefintion } from '../Editor/Libraries/lib';
+import { BlockDefinition, BlockType, NodeDefintion, BlockNode } from '../Editor/Libraries/lib';
 import replaceAll from 'string.prototype.replaceall';
+import styleCSS from './style';
+
+const style: HTMLStyleElement = document.createElement('style');
+style.innerHTML = styleCSS;
+document.getElementsByTagName('head')[0].appendChild(style);
 
 type GeneratedCode = string;
 type ArgumentType = 'string' | 'number' | 'variable' | 'object' | 'undefined';
@@ -22,6 +27,7 @@ export class LuaGenerator {
     private definedVariables: DefinedVariable[] = [];
     private tabValue: number = 0;
     tabCharacter: string = '    ';
+    htmlHighlights: boolean = false;
 
     private getTabValue(): string {
         return new Array(this.tabValue).fill(this.tabCharacter).join('');
@@ -65,6 +71,8 @@ export class LuaGenerator {
     private getLocalFreeVariable(): string {
         let id = this.localVariableID;
         this.localVariableID++;
+        let varName: string = `__local__var${id}`;
+
         return `__local__var${id}`;
     }
 
@@ -167,6 +175,10 @@ export class LuaGenerator {
         return args;
     }
 
+    private htmlDefinition(variable: string, color: string = '255, 255, 255', callback: CallableFunction | string = '() => {}') {
+        return `<div class="__lua__variable" style="--color: ${color}" onclick='(${callback})()'>${variable}</div>`;
+    }
+
     private generateCode(editor: Editor, block: Block, callback: CallableFunction, preArgs?: string): void {
         let args: ArgumentValue[] = this.getArguments(editor, block);
         let code: GeneratedCode = '';
@@ -186,8 +198,18 @@ export class LuaGenerator {
         }
 
         this.addCode(`${preArgs || ''}${code}`);
+        let id = 0;
         for(let variable of localVariables) {
-            this.addCode(`    ${variable[0]} = ${variable[1]}`)
+            if(this.htmlHighlights) {
+                let definition: BlockDefinition | null = this.getDefinition(editor, block.type);
+                let output: NodeDefintion | undefined = definition?.outputs[id];
+                let node: BlockNode | undefined = output ? editor.findNode(output.type) : undefined;
+                this.addCode(`    ${this.htmlDefinition(variable[0], node?.color.raw, () => {
+                    
+                })} = ${this.htmlDefinition(variable[1], node?.color.raw)}`);
+            } else this.addCode(`    ${variable[0]} = ${variable[1]}`)
+
+            id++;
         }
     }
 

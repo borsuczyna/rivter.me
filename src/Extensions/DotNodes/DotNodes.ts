@@ -16,12 +16,13 @@ document.getElementsByTagName('head')[0].appendChild(style);
 
 const buildTime: number = new Date().getTime();
 
-interface Dot {
+export interface Dot {
     position: Position2D;
     token: Token;
     DOM?: HTMLDivElement;
     scale: number;
     color: string;
+    tempColor: string | null;
 };
 
 interface HoldingDot {
@@ -61,7 +62,7 @@ export class DotNodes extends EditorExtension {
         dot.DOM?.style.setProperty('--position-x', `${dot.position.x}px`);
         dot.DOM?.style.setProperty('--position-y', `${dot.position.y}px`);
         dot.DOM?.style.setProperty('--scale', `${dot.scale}`);
-        dot.DOM?.style.setProperty('--color', `${dot.color}`);
+        dot.DOM?.style.setProperty('--color', `${dot.tempColor || dot.color}`);
     }
 
     private regenerateDOMs() {
@@ -103,7 +104,8 @@ export class DotNodes extends EditorExtension {
             position: position,
             token: Token.generate(),
             scale: 1,
-            color: 'rgb(255, 255, 255)'
+            color: 'rgb(255, 255, 255)',
+            tempColor: 'rgb(255, 255, 255)'
         });
     }
 
@@ -133,6 +135,12 @@ export class DotNodes extends EditorExtension {
         } else dot.scale = lerp(dot.scale, 1, 0.1);
 
         this.updatePosition(dot);
+
+        dot.tempColor = null;
+    }
+
+    getRect(dot: Dot): DOMRect | undefined {
+        return dot.DOM?.getBoundingClientRect();
     }
 
     getDotUnderCursor(): Dot | null {
