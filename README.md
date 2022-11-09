@@ -44,8 +44,7 @@ export const definitions: BlockDefinitions = {
         isEvent: false,
 
         generateCode: {
-            header: (message) => `
-	    (${message});`
+            header: (message) => `console.log(${message});`
         }
     },
 };
@@ -75,7 +74,7 @@ export const definitions: BlockDefinitions = {
         isEvent: true,
 
         generateCode: {
-            header: () => `addEventListener('program-started', ({arg1}) => {`
+            header: () => `addEventListener('program-started', ({arg1}) => {`,
 	    footer: () => `});`
         }
     },
