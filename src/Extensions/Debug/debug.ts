@@ -7,7 +7,7 @@ export class Debug extends EditorExtension {
     private frames: number[] = [];
     private lastFrame: Date = new Date();
     private currentFrames: number = 0;
-    priority: number = 500;
+    priority: number = -500;
 
     constructor() {
         super();
