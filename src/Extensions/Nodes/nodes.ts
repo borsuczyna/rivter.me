@@ -32,13 +32,69 @@ export class Nodes extends EditorExtension {
     mobileBiggerScale: boolean = true;
     lineWidth: number = 2;
     holding: HoldingNode | null = null;
+    blockMask: boolean = true;
+    maskSize: number = 35;
+    maskAlpha: number = 3;
+    private mask: {
+        canvas: HTMLCanvasElement;
+        context: CanvasRenderingContext2D;
+    };
 
     constructor() {
         super();
+
+        // @ts-ignore - just ignore that, we will fill that anyways
+        this.mask = {};
+        this.mask.canvas = document.createElement('canvas');
+        this.mask.context = this.mask.canvas.getContext('2d') as CanvasRenderingContext2D;
+    }
+
+    private updateMaskDimensions(width: number, height: number) {
+        this.mask.canvas.width = width;
+        this.mask.canvas.height = height;
+    }
+
+    private updateMask() {
+        let editor = this.editors[0];
+        if(
+            editor &&
+            this.blockMask &&
+            editor.DOM.context &&
+            editor.DOM.canvas
+        ) {
+            let editorRect: DOMRect | undefined = this.editors[0].DOM.canvas?.getBoundingClientRect();
+            editorRect = editorRect || new DOMRect(0, 0, 0, 0);
+            
+            this.mask.context.shadowBlur = this.maskSize;
+            this.mask.context.shadowColor = 'black';
+            this.mask.context.globalCompositeOperation = 'lighter';
+            this.mask.context.clearRect(0, 0, this.mask.canvas.width, this.mask.canvas.height);
+            for(let block of editor.blocks) {
+                let rect: DOMRect = block.DOM.getBoundingClientRect();
+                for(let i = 0; i < this.maskAlpha; i++) this.mask.context.fillRect(rect.x - editorRect.x, rect.y - editorRect.y, rect.width, rect.height);
+            }
+
+            let w = editor.DOM.canvas.width/2;
+            let h = editor.DOM.canvas.height/2;
+            editor.DOM.context.globalCompositeOperation = 'destination-out';
+            // editor.DOM.context.beginPath();
+            // editor.DOM.context.arc(w, h, 150, 0, 2*Math.PI);
+            // editor.DOM.context.fillStyle = 'rgba(255, 255, 255, 1)';
+            // editor.DOM.context.fill();
+            editor.DOM.context.drawImage(this.mask.canvas, 0, 0);
+            editor.DOM.context.globalCompositeOperation = 'source-over';
+        }
     }
 
     initialize = (editor: Editor) => {
         if(this.editors.length > 1) throw new Error('Nodes extension can be used only on one editor at once!');
+
+        let rect: DOMRect | undefined = this.editors[0].DOM.canvas?.getBoundingClientRect();
+        if(rect) {
+            this.updateMaskDimensions(rect.width, rect.height);
+        }
+
+        editor.addEventHandler('dimensions-update', this.updateMaskDimensions.bind(this));
     };
 
     private calculatePosition(element: HTMLDivElement, editor: Editor, scale: number = 1, addPos: number = 0, mult: number = 1.2): DOMRect {
@@ -405,6 +461,8 @@ export class Nodes extends EditorExtension {
                 );
             }
         }
+
+        this.updateMask();
 
         this.lastNode = node;
     };
