@@ -227,14 +227,12 @@ export class Block {
             let targetConnection: NodeConnection | null = block.findConnection(type, targetID);
 
             if(targetConnection && targetConnection.type == 'input') {
-                console.log(targetConnection)
                 targetConnection.block.removeConnection('output', targetConnection.targetID);
                 block.removeConnection('input', targetConnection.startID);
             }
 
             let connection: NodeConnection | null = this.findConnection(type == 'input' ? 'output' : 'input', startID);
             if(connection) {
-                console.log(connection)
                 if(connection.type == 'input') {
                     connection.block.removeConnection(type, connection.targetID);
                     this.removeConnection(type == 'input' ? 'output' : 'input', startID);
