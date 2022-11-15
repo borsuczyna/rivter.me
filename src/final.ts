@@ -24,3 +24,4 @@ export * from './Generator/Lua';
 export * from './Styles/white';
 export * from './Styles/monokai';
 export * from './Styles/unity';
+export * from './Styles/test';

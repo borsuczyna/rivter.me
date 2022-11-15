@@ -164,12 +164,16 @@ export class Block {
                 return !(connection.type == type && connection.startID == id);
             });
         }
+
+        if(this.editor) this.editor.triggerEvent('removed-node-connection');
     }
 
     removeTargetConnection(type: NodeType, startID: number, targetBlock: Block, targetID: number) {
         this.connections = this.connections.filter((connection: NodeConnection): boolean => {
             return !(connection.type == type && connection.startID == startID && connection.block == targetBlock && connection.targetID == targetID);
         });
+
+        if(this.editor) this.editor.triggerEvent('removed-node-connection');
     }
 
     findTargetConnection(block: Block, type: NodeType, id?: number): NodeConnection | null {
@@ -191,7 +195,7 @@ export class Block {
         }
     }
 
-    createConnection(block: Block, type: NodeType, startID?: number, targetID?: number) {
+    createConnection(block: Block, type: NodeType, startID?: number, targetID?: number) {        
         if(type == 'motion-next' || type == 'motion-start') {
             let connection: NodeConnection | null = this.findConnection(type);
             if(connection) {
@@ -209,8 +213,17 @@ export class Block {
                 type: type == 'motion-start' ? 'motion-next' : 'motion-start'
             });
         } else {
+            let targetConnection: NodeConnection | null = block.findConnection(type, targetID);
+
+            if(targetConnection && targetConnection.type == 'input') {
+                console.log(targetConnection)
+                targetConnection.block.removeConnection('output', targetConnection.targetID);
+                block.removeConnection('input', targetConnection.startID);
+            }
+
             let connection: NodeConnection | null = this.findConnection(type == 'input' ? 'output' : 'input', startID);
             if(connection) {
+                console.log(connection)
                 if(connection.type == 'input') {
                     connection.block.removeConnection(type, connection.targetID);
                     this.removeConnection(type == 'input' ? 'output' : 'input', startID);
@@ -240,5 +253,7 @@ export class Block {
                 targetID: startID
             });
         }
+
+        if(this.editor) this.editor.triggerEvent('new-node-connection');
     }
 }

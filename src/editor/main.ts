@@ -24,7 +24,19 @@ export class EditorExtension {
     }
 }
 
+interface EditorCallback {
+    callback: CallableFunction;
+    priority: number;
+};
+
+interface EditorEvent {
+    [name: string]: EditorCallback[];
+};
+
 export class Editor {
+    // Events
+    events: EditorEvent = {};
+
     // DOM and extensions controling them
     DOM: EditorDOM;
     extensions: EditorExtension[] = [];
@@ -58,6 +70,25 @@ export class Editor {
         this.DOM.blockDiv?.style.setProperty(key, value);
     }
 
+    addEventHandler(name: string, callback: CallableFunction, priority: number = 0) {
+        this.events[name] = this.events[name] || [];
+
+        this.events[name].push({
+            callback: callback,
+            priority: priority
+        });
+    }
+
+    triggerEvent(name: string, ...args: any[]) {
+        if(!this.events[name]) return;
+        
+        this.events[name].sort((a: EditorCallback, b: EditorCallback) => {
+            return a.priority - b.priority;
+        }).forEach((event: EditorCallback) => {
+            event.callback(...args);
+        })
+    }
+
     updateDimensions() {
         if(!this.DOM.div || !this.DOM.canvas) throw new Error('Editor DOM element not found');
 
@@ -79,6 +110,8 @@ export class Editor {
         this.updateCanvasDimensions();
 
         this.update();
+
+        this.triggerEvent('dimensions-update', rect.width, rect.height);
     }
 
     updatePosition() {

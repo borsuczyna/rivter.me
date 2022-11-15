@@ -27,11 +27,19 @@ export class LuaGenerator {
     private definedVariables: DefinedVariable[] = [];
     private tabValue: number = 0;
     private editor: Editor;
+    private generatedInCurrentScope: Block[] = [];
     tabCharacter: string = '    ';
     htmlHighlights: boolean = false;
 
     private getTabValue(): string {
         return new Array(this.tabValue).fill(this.tabCharacter).join('');
+    }
+
+    private wasBlockAlreadyGenerated(block: Block) {
+        for(let b of this.generatedInCurrentScope) {
+            if(b == block) return true;
+        }
+        return false;
     }
 
     private getScope(editor: Editor, block: Block): number | null {
@@ -162,9 +170,9 @@ export class LuaGenerator {
 
             let connection: NodeConnection | null = block.findConnection('input', inputID+1);
             if(connection && connection.block != block) {
-                if(!this.willBlockBeUsed(editor, connection.block)) {
-                    let args: string[] = this.generateBlock(editor, connection.block, true);
-                    value = args[(<number>connection.targetID)-1];
+                if(!this.willBlockBeUsed(editor, connection.block) && !this.wasBlockAlreadyGenerated(connection.block)) {
+                    let args: string[] = this.generateBlock(editor, connection.block);
+                    value = this.getVariable(connection.block, <number>connection.targetID);
                 } else {
                     value = this.getVariable(connection.block, <number>connection.targetID);
                 }
@@ -188,6 +196,8 @@ export class LuaGenerator {
         let args: ArgumentValue[] = this.getArguments(editor, block);
         let code: GeneratedCode = '';
 
+        this.generatedInCurrentScope.push(block);
+
         code = callback(...this.argValues(args));
 
         let eventVar: number = 1;
@@ -203,6 +213,7 @@ export class LuaGenerator {
             if(this.htmlHighlights) {
                 code = code.replace(`{var${eventVar}}`, this.htmlDefinition(localVariable, node?.color.raw, block, 'output', eventVar-1));
             } else code = code.replace(`{var${eventVar}}`, localVariable);
+            
             localVariables.push([variable, localVariable])
 
             eventVar++;
@@ -308,6 +319,7 @@ export class LuaGenerator {
             let definition: BlockDefinition | null = this.getDefinition(editor, block.type);
             if(!definition || !definition.isEvent) continue;
 
+            this.generatedInCurrentScope = [];
             this.localVariableID = 1;
             this.generateBlock(editor, block);
         }

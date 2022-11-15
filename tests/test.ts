@@ -1,4 +1,4 @@
-import { Editor, Background, Grabbing, Zooming, Block, Color, BlockGrabbing, Cursor, Position2D, Debug, isMobile, Nodes, styleMonokai, styleUnity, LuaGenerator, CodeVisual } from "../src/final";
+import { Editor, Background, Grabbing, Zooming, Block, Color, BlockGrabbing, Cursor, Position2D, Debug, isMobile, Nodes, styleMonokai, styleUnity, LuaGenerator, CodeVisual, styleWhite, styleTest } from "../src/final";
 // import { DotNodes } from '../src/Extensions/DotNodes/DotNodes';
 
 const editorDOM: HTMLDivElement = <HTMLDivElement> document.getElementById('editor');
@@ -58,7 +58,8 @@ const editor = new Editor(editorDOM)
 .loadLibrary(MTAServer.definitions, MTAServer.nodes)
 .addBlock(block)
 .addBlock(block2)
-// .loadStyle(whiteStyle)
+// .loadStyle(styleTest)
+// .loadStyle(styleWhite)
 // .loadStyle(styleUnity)
 // .loadStyle(styleMonokai)
 // .addBlock(new Block('@mta-server: send-message'));
@@ -74,8 +75,7 @@ addEventListener('contextmenu', (e) => {
     editor.addBlock(block);
 });
 
-// @ts-ignore
-document.getElementById('generate')?.addEventListener('click', () => {
+function regenerateCode() {
     generator.htmlHighlights = true;
 
     // @ts-ignore
@@ -84,8 +84,12 @@ document.getElementById('generate')?.addEventListener('click', () => {
     // }).value;
 
     visual.setCode(generator.generateProject(editor));
-    editor.updateDimensions();
-});
+    // editor.updateDimensions();
+}
+
+editor.addEventHandler('removed-node-connection', regenerateCode);
+editor.addEventHandler('new-node-connection', regenerateCode);
+document.getElementById('generate')?.addEventListener('click', regenerateCode);
 
 // const editorDOM2: HTMLDivElement = <HTMLDivElement> document.getElementById('editor2');
 // const editor2: Editor = new Editor();
