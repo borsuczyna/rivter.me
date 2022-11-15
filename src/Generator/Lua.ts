@@ -168,6 +168,12 @@ export class LuaGenerator {
                 type = 'string';
             }
 
+            let input: HTMLInputElement | null = block.DOM.querySelector<HTMLInputElement>(`#inputText-${i}`);
+            if(definition.inputs[inputID].inputText && input) {
+                value = input.value;
+                type = 'string';
+            }
+
             let connection: NodeConnection | null = block.findConnection('input', inputID+1);
             if(connection && connection.block != block) {
                 if(!this.willBlockBeUsed(editor, connection.block) && !this.wasBlockAlreadyGenerated(connection.block)) {
