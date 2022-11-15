@@ -55,7 +55,7 @@ export class Block {
         this.DOM.style.setProperty('--position-y', `${this.position.y}px`);
     }
 
-    private renderNode(node: NodeDefintion, type: string): HTMLCode {
+    private renderNode(node: NodeDefintion, type: string, index: number = 0): HTMLCode {
         let ball: HTMLCode = `<div class="__block__ball __block__ball__${type}"></div>`;
         let blockNode: BlockNode = this.editor.findNode(node.type);
 
@@ -63,7 +63,7 @@ export class Block {
             `<div class="__block__node __block__${type}" style="--node-color: ${blockNode.color.rgba}">
                 ${type == 'input' && node.type == 'check' ? '<input type="checkbox" checked class="__block__checkbox"/>' : ''}
                 ${(type == 'input' && node.type != 'check') && ball || ''}
-                ${(type == 'input' && node.inputText) ? `<input placeholder="${node.inputText.placeholder}" class="__block__inputText" value="${node.inputText.default}">` :node.name}
+                ${(type == 'input' && node.inputText) ? `<input placeholder="${node.inputText.placeholder}" class="__block__inputText" value="${node.inputText.default}" id="inputText-${index}">` :node.name}
                 ${type == 'output' && ball || ''}
             </div>`
         )
@@ -72,8 +72,9 @@ export class Block {
     private renderNodes(nodes: NodeDefintion[], type: 'input' | 'output'): HTMLCode {
         let code: HTMLCode = '';
 
+        let index = 0;
         nodes?.forEach((node: NodeDefintion) => {
-            code += this.renderNode(node, type);
+            code += this.renderNode(node, type, index++);
         })
 
         return code;
@@ -116,6 +117,16 @@ export class Block {
         let header: DOMRect | null | undefined = document.querySelector(`#block-${this.token} .__block__header`)?.getBoundingClientRect();
         let body: DOMRect | null | undefined = document.querySelector(`#block-${this.token}`)?.getBoundingClientRect();
         let motionStart: DOMRect | null | undefined = document.querySelector(`#block-${this.token} .__block__motions .__motion__start .__motion__icon:after`)?.getBoundingClientRect();
+        let inputs: NodeListOf<HTMLInputElement> = document.querySelectorAll(`#block-${this.token} input`);
+        
+        let index: number = 0;
+        for(let input of inputs) {
+            let rect: DOMRect = input.getBoundingClientRect();
+            if(overRect(rect, 0)) {
+                return `input${index}`;
+            }
+            index++;
+        }
 
         if(motionStart && overRect(motionStart, 0)) return 'motionStart';
         if(header && overRect(header, 0)) return 'header';

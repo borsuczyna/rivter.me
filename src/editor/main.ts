@@ -63,6 +63,10 @@ export class Editor {
         addEventListener('resize', this.updateDimensions.bind(this));
 
         this.loadStyle(defaultStyle);
+
+        this.DOM.canvas?.addEventListener('click', function(e) {
+            this.triggerEvent('click', e.offsetX, e.offsetY);
+        }.bind(this));
     }
 
     private setStyleProperty(key, value) {

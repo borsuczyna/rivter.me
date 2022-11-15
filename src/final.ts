@@ -18,6 +18,7 @@ export * from './Extensions/Debug/debug';
 export * from './Extensions/Nodes/nodes';
 export * from './Extensions/DotNodes/DotNodes';
 export * from './Extensions/CodeVisual/CodeVisual';
+export * from './Extensions/Inputs/Inputs';
 
 export * from './Generator/Lua';
 

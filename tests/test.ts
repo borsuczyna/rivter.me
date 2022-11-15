@@ -1,4 +1,4 @@
-import { Editor, Background, Grabbing, Zooming, Block, Color, BlockGrabbing, Cursor, Position2D, Debug, isMobile, Nodes, styleMonokai, styleUnity, LuaGenerator, CodeVisual, styleWhite, styleTest } from "../src/final";
+import { Editor, Background, Grabbing, Zooming, Block, Color, BlockGrabbing, Cursor, Position2D, Debug, isMobile, Nodes, styleMonokai, styleUnity, LuaGenerator, CodeVisual, styleWhite, styleTest, Inputs } from "../src/final";
 // import { DotNodes } from '../src/Extensions/DotNodes/DotNodes';
 
 const editorDOM: HTMLDivElement = <HTMLDivElement> document.getElementById('editor');
@@ -11,6 +11,7 @@ const cursor: Cursor = new Cursor();
 const debug: Debug = new Debug();
 const nodes: Nodes = new Nodes();
 const visual: CodeVisual = new CodeVisual();
+const inputs: Inputs = new Inputs();
 // const dots: DotNodes = new DotNodes();
 // blockGrabbing.mobileSupport = false;
 
@@ -52,6 +53,7 @@ const editor = new Editor(editorDOM)
 .use(cursor)
 .use(nodes)
 .use(visual)
+.use(inputs)
 // .use(dots)
 // .use(dots)
 // .use(debug)
