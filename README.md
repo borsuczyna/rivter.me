@@ -55,7 +55,7 @@ export const definitions: BlockDefinitions = {
 import { BlockDefinitions, BlockNodes, Color } from './rivter-latest';
 
 export const definitions: BlockDefinitions = {
-    '@your-library: console-log': {
+    '@your-library: program-started': {
         name: 'Program started',
         hoverTip: 'Triggered when program is started',
 
